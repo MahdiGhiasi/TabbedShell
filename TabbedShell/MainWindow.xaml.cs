@@ -120,8 +120,8 @@ namespace TabbedShell
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
         {
-            WindowFunctions.SetWindowLongPtr(new HandleRef(this, containedWindowHandle), WindowFunctions.GWL_EXSTYLE, new IntPtr(WindowFunctions.GetWindowLongPtr(containedWindowHandle, WindowFunctions.GWL_EXSTYLE).ToInt32() | WindowFunctions.WS_EX_LAYERED));
-            WindowFunctions.SetLayeredWindowAttributes(containedWindowHandle, 0, (byte)(opacity * 255), WindowFunctions.LWA_ALPHA);
+            Win32Functions.SetWindowLongPtr(new HandleRef(this, containedWindowHandle), Win32Functions.GWL_EXSTYLE, new IntPtr(Win32Functions.GetWindowLongPtr(containedWindowHandle, Win32Functions.GWL_EXSTYLE).ToInt32() | Win32Functions.WS_EX_LAYERED));
+            Win32Functions.SetLayeredWindowAttributes(containedWindowHandle, 0, (byte)(opacity * 255), Win32Functions.LWA_ALPHA);
         }
 
         private async void Window_Activated(object sender, EventArgs e)
@@ -133,7 +133,7 @@ namespace TabbedShell
             if (!switchToContentEnabled)
                 return;
 
-            WindowFunctions.SetForegroundWindow(CurrentContainedWindowHandle);
+            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private async void ContainTargetWindow(IntPtr target)
@@ -153,21 +153,21 @@ namespace TabbedShell
 
             await Task.Delay(10);
 
-            int style = WindowFunctions.GetWindowLongPtr(target, WindowFunctions.GWL_STYLE).ToInt32();
-            int newStyle = style & ~(WindowFunctions.WS_CHILD);
-            WindowFunctions.SetWindowLongPtr(new HandleRef(this, target), WindowFunctions.GWL_STYLE, new IntPtr(newStyle));
+            int style = Win32Functions.GetWindowLongPtr(target, Win32Functions.GWL_STYLE).ToInt32();
+            int newStyle = style & ~(Win32Functions.WS_CHILD);
+            Win32Functions.SetWindowLongPtr(new HandleRef(this, target), Win32Functions.GWL_STYLE, new IntPtr(newStyle));
 
             await Task.Delay(10);
 
             MaximizeWindow(target, Win32.Enums.ShowWindowCommands.Normal);
-            WindowFunctions.SetForegroundWindow(target);
+            Win32Functions.SetForegroundWindow(target);
         }
 
         private static void MaximizeWindow(IntPtr target, Win32.Enums.ShowWindowCommands cmd)
         {
             WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
             placement.Length = Marshal.SizeOf(placement);
-            WindowFunctions.GetWindowPlacement(target, ref placement);
+            Win32Functions.GetWindowPlacement(target, ref placement);
 
             if (placement.ShowCmd != Win32.Enums.ShowWindowCommands.Maximize)
             {
@@ -179,7 +179,7 @@ namespace TabbedShell
                     MinPosition = placement.MinPosition,
                     NormalPosition = placement.NormalPosition,
                 };
-                WindowFunctions.SetWindowPlacement(target, ref newPlacement);
+                Win32Functions.SetWindowPlacement(target, ref newPlacement);
             }
         }
 
@@ -209,7 +209,7 @@ namespace TabbedShell
             switchToContentEnabled = true;
             Debug.WriteLine("MouseLeave");
 
-            WindowFunctions.SetForegroundWindow(CurrentContainedWindowHandle);
+            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private void NewPage_Click(object sender, RoutedEventArgs e)
@@ -269,7 +269,7 @@ namespace TabbedShell
 
         private void CloseWindowProcess(IntPtr windowHandle)
         {
-            WindowFunctions.GetWindowThreadProcessId(windowHandle, out uint processId);
+            Win32Functions.GetWindowThreadProcessId(windowHandle, out uint processId);
             var process = Process.GetProcessById((int)processId);
 
             // TODO: Kill child processes as well (When cmd runs another cmd or bash inside itself)

@@ -8,7 +8,7 @@ using TabbedShell.Win32.Structs;
 
 namespace TabbedShell.Win32.Interop
 {
-    public static class WindowFunctions
+    public static class Win32Functions
     {
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);

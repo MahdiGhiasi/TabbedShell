@@ -23,14 +23,14 @@ namespace TabbedShell
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
-            int style = WindowFunctions.GetWindowLongPtr(childRef, WindowFunctions.GWL_STYLE).ToInt32();
+            int style = Win32Functions.GetWindowLongPtr(childRef, Win32Functions.GWL_STYLE).ToInt32();
 
-            int newStyle = style & ~(WindowFunctions.WS_MAXIMIZEBOX | WindowFunctions.WS_MINIMIZEBOX | WindowFunctions.WS_CAPTION | WindowFunctions.WS_THICKFRAME);
-            newStyle |= WindowFunctions.WS_CHILD;
+            int newStyle = style & ~(Win32Functions.WS_MAXIMIZEBOX | Win32Functions.WS_MINIMIZEBOX | Win32Functions.WS_CAPTION | Win32Functions.WS_THICKFRAME);
+            newStyle |= Win32Functions.WS_CHILD;
 
-            WindowFunctions.SetWindowLongPtr(new HandleRef(this, childRef), WindowFunctions.GWL_STYLE, new IntPtr(newStyle));
+            Win32Functions.SetWindowLongPtr(new HandleRef(this, childRef), Win32Functions.GWL_STYLE, new IntPtr(newStyle));
 
-            WindowFunctions.SetParent(childRef, hwndParent.Handle);
+            Win32Functions.SetParent(childRef, hwndParent.Handle);
 
             return new HandleRef(this, childRef);
         }
