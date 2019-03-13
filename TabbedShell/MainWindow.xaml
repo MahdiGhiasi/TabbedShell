@@ -99,7 +99,7 @@
                                    Foreground="White"
                                    TextAlignment="Center" />
                     </Button>
-                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="CloseWindow_Click">
+                    <Button Width="45" Style="{StaticResource WindowCloseButton}" Click="CloseWindow_Click">
                         <TextBlock Text="&#xE947;"
                                    FontFamily="Segoe MDL2 Assets"
                                    Foreground="White"
