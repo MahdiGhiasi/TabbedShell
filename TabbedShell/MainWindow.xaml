@@ -50,14 +50,17 @@
                                             <ColumnDefinition Width="30" />
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0" 
-                                                Background="Transparent"
-                                                Style="{StaticResource ThemedButton}"
+                                                Style="{StaticResource TabTitleButton}"
                                                 IsManipulationEnabled="True"
                                                 Click="Tab_Click"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
                                                 Tag="{Binding HostedWindowItem, Mode=OneWay}">
                                             <TextBlock Text="{Binding Title, Mode=OneWay}"
                                                        Foreground="White"
                                                        Margin="8,0,0,0"
+                                                       TextAlignment="Left"
+                                                       HorizontalAlignment="Stretch"
                                                        VerticalAlignment="Center" />
                                         </Button>
                                         <Grid Grid.Column="1">
