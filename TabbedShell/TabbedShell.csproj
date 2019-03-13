@@ -64,7 +64,7 @@
     <Compile Include="Model\UI\TabItem.cs" />
     <Compile Include="TargetWindowHost.cs" />
     <Compile Include="Win32\Enums\ShowWindowCommands.cs" />
-    <Compile Include="Win32\Interop\WindowFunctions.cs" />
+    <Compile Include="Win32\Interop\Win32Functions.cs" />
     <Compile Include="Win32\Structs\WINDOWPLACEMENT.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
