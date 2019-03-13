@@ -93,7 +93,7 @@ namespace TabbedShell
             ActivateTab(Tabs.Count - 1);
         }
 
-        private void AttachToConhost(IntPtr handle)
+        private void AttachToWindow(IntPtr handle)
         {
             ContainTargetWindow(handle);
             SetWindowOpacity(handle, 0.65);
@@ -104,7 +104,7 @@ namespace TabbedShell
             for (int i = 0; i < Tabs.Count; i++)
                 Tabs[i].IsActive = (i == index);
 
-            AttachToConhost(Tabs[index].HostedWindowItem.WindowHandle);
+            AttachToWindow(Tabs[index].HostedWindowItem.WindowHandle);
         }
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
