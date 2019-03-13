@@ -228,13 +228,22 @@ namespace TabbedShell
 
             Tabs.RemoveAt(index);
 
-            if (activeIndex == index)
+            if (Tabs.Count == 0)
+            {
+                CloseWindow();
+            }
+            else if (activeIndex == index)
             {
                 ActivateTab(Math.Min(index + 1, Tabs.Count - 1));
             }
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            CloseWindow();
+        }
+
+        private void CloseWindow()
         {
             foreach (var tab in Tabs)
             {
