@@ -32,7 +32,8 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <Grid x:Name="TabReferenceSize" Visibility="Hidden" Grid.Column="0" />
+                <StackPanel Orientation="Horizontal" Grid.Column="0" x:Name="TabsContainer">
                     <ItemsControl x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -42,7 +43,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,0,0,0">
-                                    <Grid Background="{Binding TabBackColor, Mode=OneWay}" Width="180">
+                                    <Grid Background="{Binding TabBackColor, Mode=OneWay}" 
+                                          Width="{Binding ActualWidth, ElementName=TabReferenceSize, Mode=OneWay}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="30" />
@@ -74,7 +76,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Button Style="{StaticResource ThemedButton}" Width="30" Click="NewPage_Click">
+                    <Button Style="{StaticResource ThemedButton}" x:Name="NewTab" Width="30" Click="NewTab_Click">
                         <TextBlock Text="&#xE948;"
                                    FontFamily="Segoe MDL2 Assets"
                                    Foreground="White"

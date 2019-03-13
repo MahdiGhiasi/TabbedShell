@@ -42,6 +42,12 @@ namespace TabbedShell
             InitializeComponent();
 
             TabsList.ItemsSource = Tabs;
+            Tabs.CollectionChanged += Tabs_CollectionChanged;
+        }
+
+        private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            TabReferenceSize.Width = Math.Min(201, ((TabsContainer.ActualWidth - NewTab.ActualWidth) / Tabs.Count) - 1);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -195,7 +201,7 @@ namespace TabbedShell
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
-        private void NewPage_Click(object sender, RoutedEventArgs e)
+        private void NewTab_Click(object sender, RoutedEventArgs e)
         {
             StartCmd();
         }
