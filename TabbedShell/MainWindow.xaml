@@ -5,8 +5,108 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TabbedShell"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Activated="Window_Activated"
+        Loaded="Window_Loaded"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        MouseLeftButtonUp="Window_MouseLeftButtonUp"
+        MouseEnter="Window_MouseEnter"
+        MouseLeave="Window_MouseLeave"
+        Background="#55000000"
+        Title="MainWindow" 
+        WindowStyle="None"
+        Height="450" 
+        Width="800">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderThickness="0.5" BorderBrush="#88444444">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <ItemsControl x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,0,0,0">
+                                    <Grid Background="{Binding TabBackColor, Mode=OneWay}" Width="180">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="30" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" 
+                                                Background="Transparent"
+                                                Style="{StaticResource ThemedButton}"
+                                                IsManipulationEnabled="True"
+                                                Click="Tab_Click"
+                                                Tag="{Binding HostedWindowItem, Mode=OneWay}">
+                                            <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                                       Foreground="White"
+                                                       Margin="8,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                        </Button>
+                                        <Grid Grid.Column="1">
+                                            <Button Style="{StaticResource ThemedButton}"
+                                                    Tag="{Binding HostedWindowItem, Mode=OneWay}"
+                                                    Click="TabClose_Click">
+                                                <TextBlock Text="&#xE947;"
+                                                           FontFamily="Segoe MDL2 Assets"
+                                                           Foreground="White"
+                                                           TextAlignment="Center" />
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Width="1" Background="#aa999999" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Style="{StaticResource ThemedButton}" Width="30" Click="NewPage_Click">
+                        <TextBlock Text="&#xE948;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   Foreground="White"
+                                   TextAlignment="Center" />
+                    </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MinimizeWindow_Click">
+                        <TextBlock Text="&#xE949;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   Foreground="White"
+                                   TextAlignment="Center" />
+                    </Button>
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click">
+                        <TextBlock Text="&#xE15B;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   Foreground="White"
+                                   TextAlignment="Center" />
+                    </Button>
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="CloseWindow_Click">
+                        <TextBlock Text="&#xE947;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   Foreground="White"
+                                   TextAlignment="Center" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" x:Name="wrapperContainer" Margin="0,-1,0,0">
+                <Border x:Name="WindowContainer" Margin="1.5,0,1.5,1.5" BorderThickness="0">
+                </Border>
+                <Button Content="Attach" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="673,85,0,-75" Click="AttachButton_Click" />
+            </Grid>
+        </Grid>
+    </Border>
 </Window>
