@@ -89,7 +89,7 @@
                                    FontFamily="Segoe MDL2 Assets"
                                    TextAlignment="Center" />
                     </Button>
-                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click">
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click" IsEnabled="False" Opacity="0.3">
                         <TextBlock Text="&#xE15B;"
                                    FontFamily="Segoe MDL2 Assets"
                                    TextAlignment="Center" />
