@@ -57,19 +57,17 @@
                                                 HorizontalContentAlignment="Stretch"
                                                 Tag="{Binding HostedWindowItem, Mode=OneWay}">
                                             <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                       Foreground="White"
                                                        Margin="8,0,0,0"
                                                        TextAlignment="Left"
                                                        HorizontalAlignment="Stretch"
                                                        VerticalAlignment="Center" />
                                         </Button>
                                         <Grid Grid.Column="1">
-                                            <Button Style="{StaticResource ThemedButton}"
+                                            <Button Style="{StaticResource TabCloseButton}"
                                                     Tag="{Binding HostedWindowItem, Mode=OneWay}"
                                                     Click="TabClose_Click">
                                                 <TextBlock Text="&#xE947;"
                                                            FontFamily="Segoe MDL2 Assets"
-                                                           Foreground="White"
                                                            TextAlignment="Center" />
                                             </Button>
                                         </Grid>
@@ -82,7 +80,6 @@
                     <Button Style="{StaticResource ThemedButton}" x:Name="NewTab" Width="30" Click="NewTab_Click">
                         <TextBlock Text="&#xE948;"
                                    FontFamily="Segoe MDL2 Assets"
-                                   Foreground="White"
                                    TextAlignment="Center" />
                     </Button>
                 </StackPanel>
@@ -90,19 +87,16 @@
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="MinimizeWindow_Click">
                         <TextBlock Text="&#xE949;"
                                    FontFamily="Segoe MDL2 Assets"
-                                   Foreground="White"
                                    TextAlignment="Center" />
                     </Button>
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click">
                         <TextBlock Text="&#xE15B;"
                                    FontFamily="Segoe MDL2 Assets"
-                                   Foreground="White"
                                    TextAlignment="Center" />
                     </Button>
                     <Button Width="45" Style="{StaticResource WindowCloseButton}" Click="CloseWindow_Click">
                         <TextBlock Text="&#xE947;"
                                    FontFamily="Segoe MDL2 Assets"
-                                   Foreground="White"
                                    TextAlignment="Center" />
                     </Button>
                 </StackPanel>
