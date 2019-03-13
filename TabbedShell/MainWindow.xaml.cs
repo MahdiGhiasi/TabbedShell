@@ -91,8 +91,6 @@ namespace TabbedShell
             Tabs.Add(tabItem);
 
             ActivateTab(Tabs.Count - 1);
-
-            AttachToConhost(process.MainWindowHandle);
         }
 
         private void AttachToConhost(IntPtr handle)
@@ -105,6 +103,8 @@ namespace TabbedShell
         {
             for (int i = 0; i < Tabs.Count; i++)
                 Tabs[i].IsActive = (i == index);
+
+            AttachToConhost(Tabs[index].HostedWindowItem.WindowHandle);
         }
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
@@ -213,8 +213,6 @@ namespace TabbedShell
 
             var index = Tabs.IndexOf(hostedWindowItem.TabItem);
             ActivateTab(index);
-
-            AttachToConhost(hostedWindowItem.WindowHandle);
         }
 
         private void TabClose_Click(object sender, RoutedEventArgs e)
