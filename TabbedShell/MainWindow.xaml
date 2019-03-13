@@ -105,7 +105,6 @@
             <Grid Grid.Row="1" x:Name="wrapperContainer" Margin="0,-1,0,0">
                 <Border x:Name="WindowContainer" Margin="1.5,0,1.5,1.5" BorderThickness="0">
                 </Border>
-                <Button Content="Attach" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="673,85,0,-75" Click="AttachButton_Click" />
             </Grid>
         </Grid>
     </Border>

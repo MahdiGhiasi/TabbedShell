@@ -89,23 +89,6 @@ namespace TabbedShell
             AttachToConhost(process.MainWindowHandle);
         }
 
-        private void AttachButton_Click(object sender, RoutedEventArgs e)
-        {
-            var handle = new IntPtr(Convert.ToInt32(Microsoft.VisualBasic.Interaction.InputBox("handle?"), 16));
-            AttachToConhost(CurrentContainedWindowHandle);
-            //AcrylicBlurHelper.DisableAcrylicBlur(containedWindowHandle);
-
-            //if (windowWrappper != null)
-            //{
-            //    windowWrappper.Close();
-            //}
-
-            //windowWrappper = new TargetWindowWrappper(handle);
-
-            //windowWrappper.Show();
-            //DockWrapperWindows();
-        }
-
         private void AttachToConhost(IntPtr handle)
         {
             ContainTargetWindow(handle);
