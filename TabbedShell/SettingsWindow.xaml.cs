@@ -29,11 +29,18 @@ namespace TabbedShell
 
         public static bool IsOpen => instance != null;
 
-        public static void ShowSettingsWindow()
+        public static void ShowSettingsWindow(Point? centerPoint = null)
         {
             if (instance == null)
             {
                 instance = new SettingsWindow();
+                
+                if (centerPoint.HasValue)
+                {
+                    instance.Left = centerPoint.Value.X - instance.Width / 2;
+                    instance.Top = centerPoint.Value.Y - instance.Height / 2;
+                }
+
                 instance.Show();
             }
             else

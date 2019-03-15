@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using TabbedShell.Model.ContextMenu;
 
 namespace TabbedShell.ContextMenus
@@ -32,7 +33,7 @@ namespace TabbedShell.ContextMenus
                         Text = "Settings",
                         Action = (ownerWindow) =>
                         {
-                            SettingsWindow.ShowSettingsWindow();
+                            SettingsWindow.ShowSettingsWindow(new Point(ownerWindow.Left + ownerWindow.Width / 2, ownerWindow.Top + ownerWindow.Height / 2));
                         }
                     });
                 }
