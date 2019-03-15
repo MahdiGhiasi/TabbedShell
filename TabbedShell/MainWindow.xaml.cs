@@ -30,7 +30,7 @@ namespace TabbedShell
     /// </summary>
     public partial class MainWindow : Window
     {
-        FullyObservableCollection<Model.UI.TabItem> Tabs { get; } = new FullyObservableCollection<Model.UI.TabItem>();
+        ObservableCollection<Model.UI.TabItem> Tabs { get; } = new ObservableCollection<Model.UI.TabItem>();
         int ActiveTabIndex => Tabs.IndexOf(Tabs.FirstOrDefault(x => x.IsActive));
         IntPtr CurrentContainedWindowHandle => ActiveTabIndex == -1 ? IntPtr.Zero : Tabs[ActiveTabIndex].HostedWindowItem.WindowHandle;
 

@@ -24,6 +24,7 @@ namespace TabbedShell.Model.UI
             {
                 isActive = value;
                 NotifyPropertyChanged(nameof(IsActive));
+                NotifyPropertyChanged(nameof(TabBackColor));
             }
         }
 

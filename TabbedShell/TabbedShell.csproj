@@ -85,7 +85,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\FullyObservableCollection.cs" />
     <Compile Include="ContextMenus\ContextMenu.xaml.cs">
       <DependentUpon>ContextMenu.xaml</DependentUpon>
     </Compile>

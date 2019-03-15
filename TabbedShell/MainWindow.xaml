@@ -23,6 +23,11 @@
                       ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
 
+    <Window.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Border BorderThickness="0.5" BorderBrush="#88444444">
         <Grid>
             <Grid.RowDefinitions>
@@ -45,8 +50,27 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
+                                <DataTemplate.Resources>
+                                    <ResourceDictionary>
+                                        <Storyboard x:Key="TabEnterStoryboard">
+                                            <DoubleAnimation Storyboard.TargetName="TabGrid"
+                                                             Storyboard.TargetProperty="MaxWidth"
+                                                             Duration="0:0:0.25" From="0" To="200">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </ResourceDictionary>
+                                </DataTemplate.Resources>
+                                <DataTemplate.Triggers>
+                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource TabEnterStoryboard}" />
+                                    </EventTrigger>
+                                </DataTemplate.Triggers>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,0,0,0">
-                                    <Grid Background="{Binding TabBackColor, Mode=OneWay}" 
+                                    <Grid x:Name="TabGrid" 
+                                          Background="{Binding TabBackColor, Mode=OneWay}" 
                                           Width="{Binding ActualWidth, ElementName=TabReferenceSize, Mode=OneWay}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
