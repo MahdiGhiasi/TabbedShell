@@ -340,9 +340,9 @@ namespace TabbedShell
                 if (procId == myProcId)
                     continue;
 
-                var process = Process.GetProcessById((int)procId);
                 try
                 {
+                    var process = Process.GetProcessById((int)procId);
                     process.Kill();
                 }
                 catch { }
