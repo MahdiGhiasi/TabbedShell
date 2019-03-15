@@ -98,6 +98,9 @@ namespace TabbedShell.ContextMenus
         {
             threeDotContextMenu?.Close();
             newTabContextMenu?.Close();
+
+            threeDotContextMenu = null;
+            newTabContextMenu = null;
         }
     }
 }
