@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Interop;
 using TabbedShell.Win32.Interop;
 
-namespace TabbedShell
+namespace TabbedShell.Classes
 {
     public class MyHost : HwndHost
     {

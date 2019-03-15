@@ -84,7 +84,7 @@
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />
     <Compile Include="Model\HostedWindowItem.cs" />
     <Compile Include="Model\UI\TabItem.cs" />
-    <Compile Include="TargetWindowHost.cs" />
+    <Compile Include="Classes\TargetWindowHost.cs" />
     <Compile Include="Win32\Enums\ShowWindowCommands.cs" />
     <Compile Include="Win32\Interop\Win32Functions.cs" />
     <Compile Include="Win32\Structs\WINDOWPLACEMENT.cs" />
