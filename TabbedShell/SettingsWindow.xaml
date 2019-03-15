@@ -36,7 +36,7 @@
     </Window.Resources>
     <Grid>
         <ScrollViewer>
-            <StackPanel Margin="16,16,16,0">
+            <StackPanel Margin="16,16,16,16">
                 <TextBlock Text="Attach to all terminal windows"
                            FontSize="14"
                            TextWrapping="Wrap" />
