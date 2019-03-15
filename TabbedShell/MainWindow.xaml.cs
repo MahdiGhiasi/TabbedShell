@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -52,7 +53,14 @@ namespace TabbedShell
 
         private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            TabReferenceSize.Width = Math.Min(201, ((TabsContainer.ActualWidth - NewTab.ActualWidth) / Tabs.Count) - 1);
+            SetTabReferenceSize(Tabs.Count);
+        }
+
+        private void SetTabReferenceSize(int tabsCount)
+        {
+            var da = new DoubleAnimation(Math.Min(201, ((TabsContainer.ColumnDefinitions[0].ActualWidth - NewTab.ActualWidth) / tabsCount) - 1), TimeSpan.FromSeconds(0.2));
+            da.EasingFunction = new ExponentialEase();
+            TabReferenceSize.BeginAnimation(Grid.WidthProperty, da);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -243,23 +251,31 @@ namespace TabbedShell
             CloseTab(hostedWindowItem);
         }
 
-        private void CloseTab(HostedWindowItem hostedWindowItem)
+        private async void CloseTab(HostedWindowItem hostedWindowItem)
         {
             CloseWindowProcess(hostedWindowItem.WindowHandle);
 
             var index = Tabs.IndexOf(hostedWindowItem.TabItem);
             var activeIndex = ActiveTabIndex;
 
-            Tabs.RemoveAt(index);
+            Tabs[index].Exiting = true;
 
-            if (Tabs.Count == 0)
+            SetTabReferenceSize(Tabs.Count - 1);
+
+            if (Tabs.Count == 1)
             {
                 CloseWindow(sendCloseRequest: true);
             }
             else if (activeIndex == index)
             {
-                ActivateTab(Math.Min(index + 1, Tabs.Count - 1));
+                if (index == Tabs.Count - 1)
+                    ActivateTab(Tabs.Count - 2);
+                else
+                    ActivateTab(index + 1);
             }
+
+            await Task.Delay(200);
+            Tabs.RemoveAt(index);
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)

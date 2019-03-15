@@ -13,6 +13,20 @@ namespace TabbedShell.Model.UI
         public HostedWindowItem HostedWindowItem { get; set; }
         public string Title => HostedWindowItem.Title;
 
+        private bool exiting = false;
+        public bool Exiting
+        {
+            get
+            {
+                return exiting;
+            }
+            set
+            {
+                exiting = value;
+                NotifyPropertyChanged(nameof(Exiting));
+            }
+        }
+
         private bool isActive = false;
         public bool IsActive
         {

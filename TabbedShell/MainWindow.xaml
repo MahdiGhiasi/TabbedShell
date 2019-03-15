@@ -34,14 +34,14 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Margin="0,0,0,0">
+            <Grid Grid.Row="0" Margin="0,0,0,0" x:Name="TabsContainer">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="TabReferenceSize" Visibility="Hidden" Grid.Column="0" />
-                <StackPanel Orientation="Horizontal" Grid.Column="0" x:Name="TabsContainer">
+                <Grid x:Name="TabReferenceSize" Visibility="Hidden" Width="201" Grid.Column="0" />
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
                     <ItemsControl x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -61,12 +61,26 @@
                                                 </DoubleAnimation.EasingFunction>
                                             </DoubleAnimation>
                                         </Storyboard>
+                                        <Storyboard x:Key="TabExitStoryboard">
+                                            <DoubleAnimation Storyboard.TargetName="TabGrid"
+                                                             Storyboard.TargetProperty="Width"
+                                                             Duration="0:0:0.15" To="0">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
                                     </ResourceDictionary>
                                 </DataTemplate.Resources>
                                 <DataTemplate.Triggers>
                                     <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                                         <BeginStoryboard Storyboard="{StaticResource TabEnterStoryboard}" />
                                     </EventTrigger>
+                                    <DataTrigger Binding="{Binding Exiting, Mode=OneWay}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Storyboard="{StaticResource TabExitStoryboard}" />
+                                        </DataTrigger.EnterActions>
+                                    </DataTrigger>
                                 </DataTemplate.Triggers>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,0,0,0">
                                     <Grid x:Name="TabGrid" 
