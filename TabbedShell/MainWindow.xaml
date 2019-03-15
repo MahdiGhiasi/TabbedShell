@@ -13,6 +13,7 @@
         MouseLeave="Window_MouseLeave"
         Closing="Window_Closing"
         Closed="Window_Closed"
+        SizeChanged="Window_SizeChanged"
         Background="#55000000"
         Title="MainWindow" 
         WindowStyle="None"

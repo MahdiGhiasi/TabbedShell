@@ -53,6 +53,16 @@ namespace TabbedShell
 
         private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            SetTabReferenceSize();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            SetTabReferenceSize();
+        }
+
+        private void SetTabReferenceSize()
+        {
             SetTabReferenceSize(Tabs.Count);
         }
 
