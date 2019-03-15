@@ -231,12 +231,23 @@ namespace TabbedShell
             ActivateTab(index);
         }
 
+        private void Tab_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle && e.MiddleButton == MouseButtonState.Released)
+            {
+                var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
+                CloseTab(hostedWindowItem);
+            }
+        }
+
         private void TabClose_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Tab close");
-
             var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
+            CloseTab(hostedWindowItem);
+        }
 
+        private void CloseTab(HostedWindowItem hostedWindowItem)
+        {
             CloseWindowProcess(hostedWindowItem.WindowHandle);
 
             var index = Tabs.IndexOf(hostedWindowItem.TabItem);

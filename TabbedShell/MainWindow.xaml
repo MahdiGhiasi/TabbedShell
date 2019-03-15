@@ -55,6 +55,7 @@
                                                 Style="{StaticResource TabTitleButton}"
                                                 IsManipulationEnabled="True"
                                                 Click="Tab_Click"
+                                                MouseUp="Tab_MouseUp"
                                                 HorizontalAlignment="Stretch"
                                                 HorizontalContentAlignment="Stretch"
                                                 Tag="{Binding HostedWindowItem, Mode=OneWay}">
