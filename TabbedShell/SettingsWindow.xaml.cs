@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TabbedShell.Helpers;
 
 namespace TabbedShell
 {
@@ -44,6 +45,11 @@ namespace TabbedShell
         private void MetroWindow_Closed(object sender, EventArgs e)
         {
             instance = null;
+        }
+
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.EnableAcrylicBlur();
         }
     }
 }

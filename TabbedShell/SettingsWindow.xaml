@@ -7,10 +7,13 @@
                  xmlns:local="clr-namespace:TabbedShell"
                  mc:Ignorable="d"
                  Closed="MetroWindow_Closed"
+                 Loaded="MetroWindow_Loaded"
                  TitleCaps="False"
+                 AllowsTransparency="True"
                  WindowTitleBrush="Transparent"
                  Title="TabbedShell Settings"
                  ResizeMode="NoResize"
+                 Background="#992B2B2B"
                  Height="500" 
                  Width="400">
     <Window.Resources>
@@ -31,7 +34,7 @@
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid Background="#2B2B2B">
+    <Grid>
         <ScrollViewer>
             <StackPanel Margin="16,16,16,0">
                 <TextBlock Text="Attach to all terminal windows"
