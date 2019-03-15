@@ -32,6 +32,7 @@
             <Grid Grid.Row="0" Margin="0,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid x:Name="TabReferenceSize" Visibility="Hidden" Grid.Column="0" />
@@ -86,7 +87,7 @@
                                    TextAlignment="Center" />
                     </Button>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <StackPanel Orientation="Horizontal" Grid.Column="2">
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="ThreeDotsMenu_Click">
                         <TextBlock Text="&#xE712;"
                                    FontFamily="Segoe MDL2 Assets"
