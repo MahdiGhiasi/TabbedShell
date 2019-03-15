@@ -79,6 +79,25 @@
                         Ticks="40 45 50 55 60 65 70 75 80 85 90"
                         IsSnapToTickEnabled="True"
                         Value="70" />
+                <TextBlock Text="New tab button click behavior"
+                           Margin="0,24,0,0"
+                           FontSize="14"
+                           TextWrapping="Wrap" />
+                <ComboBox Width="300"
+                          Margin="0,8,0,0"
+                          HorizontalAlignment="Left"
+                          BorderThickness="1"
+                          SelectedIndex="0">
+                    <ComboBoxItem Content="New Command Prompt tab" />
+                    <ComboBoxItem Content="New PowerShell tab" />
+                    <ComboBoxItem Content="New Windows Subsystem for Linux tab" />
+                    <ComboBoxItem Content="Open context menu" />
+                </ComboBox>
+                <TextBlock Text="Right clicking on new tab button always opens the context menu."
+                           Margin="0,8,0,0"
+                           FontSize="13"
+                           Opacity="0.7"
+                           TextWrapping="Wrap" />
                 <Grid Margin="0,40,0,0"
                       Height="1"
                       Background="#505050" />
