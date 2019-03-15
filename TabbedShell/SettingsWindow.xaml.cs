@@ -33,9 +33,12 @@ namespace TabbedShell
             if (instance == null)
             {
                 instance = new SettingsWindow();
+                instance.Show();
             }
-
-            instance.Show();
+            else
+            {
+                instance.Activate();
+            }
         }
 
         private void MetroWindow_Closed(object sender, EventArgs e)
