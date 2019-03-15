@@ -46,8 +46,8 @@ namespace TabbedShell
             Tabs.CollectionChanged += Tabs_CollectionChanged;
 
             (App.Current as App).MainWindows.Add(this);
-            
-            StartProcess("cmd.exe", "Command Prompt");
+
+            Task.Run(() => StartProcess("cmd.exe", "Command Prompt"));
         }
 
         private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -58,12 +58,6 @@ namespace TabbedShell
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.EnableAcrylicBlur();
-
-            foreach (var item in Process.GetProcessesByName("conhost"))
-            {
-                var handle = item.MainWindowHandle;
-                Debug.WriteLine(handle);
-            }
         }
 
         public async void StartProcess(string procName, string title = "")
@@ -79,20 +73,23 @@ namespace TabbedShell
                 await Task.Delay(10);
             }
 
-            var windowItem = new HostedWindowItem
+            await Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, (Action)(() =>
             {
-                WindowHandle = process.MainWindowHandle,
-                Title = title,
-            };
-            var tabItem = new Model.UI.TabItem
-            {
-                IsActive = true,
-                HostedWindowItem = windowItem,
-            };
-            windowItem.TabItem = tabItem;
-            Tabs.Add(tabItem);
+                var windowItem = new HostedWindowItem
+                {
+                    WindowHandle = process.MainWindowHandle,
+                    Title = title,
+                };
+                var tabItem = new Model.UI.TabItem
+                {
+                    IsActive = true,
+                    HostedWindowItem = windowItem,
+                };
+                windowItem.TabItem = tabItem;
+                Tabs.Add(tabItem);
 
-            ActivateTab(Tabs.Count - 1);
+                ActivateTab(Tabs.Count - 1);
+            }));
         }
 
         private void AttachToWindow(IntPtr handle)
