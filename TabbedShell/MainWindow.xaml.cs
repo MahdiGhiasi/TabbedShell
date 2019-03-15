@@ -44,6 +44,8 @@ namespace TabbedShell
 
             TabsList.ItemsSource = Tabs;
             Tabs.CollectionChanged += Tabs_CollectionChanged;
+
+            StartProcess("cmd.exe", "Command Prompt");
         }
 
         private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -60,8 +62,6 @@ namespace TabbedShell
                 var handle = item.MainWindowHandle;
                 Debug.WriteLine(handle);
             }
-
-            StartProcess("cmd.exe", "Command Prompt");
         }
 
         public async void StartProcess(string procName, string title = "")
