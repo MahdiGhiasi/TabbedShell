@@ -333,7 +333,10 @@ namespace TabbedShell
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            AppContextMenus.Close();
+            (App.Current as App).MainWindows.Remove(this);
+
+            if ((App.Current as App).MainWindows.Count == 0)
+                Application.Current.Shutdown();
         }
     }
 }
