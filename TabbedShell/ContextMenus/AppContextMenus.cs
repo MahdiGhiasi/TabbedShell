@@ -30,10 +30,9 @@ namespace TabbedShell.ContextMenus
                     threeDotContextMenu.Items.Add(new ContextMenuItem
                     {
                         Text = "Settings",
-                        Action = async (ownerWindow) =>
+                        Action = (ownerWindow) =>
                         {
-                            var uri = new Uri("tabbedshellmodern:settings");
-                            await Windows.System.Launcher.LaunchUriAsync(uri);
+                            SettingsWindow.ShowSettingsWindow();
                         }
                     });
                 }

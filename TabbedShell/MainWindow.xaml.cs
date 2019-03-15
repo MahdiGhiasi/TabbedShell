@@ -124,7 +124,7 @@ namespace TabbedShell
             if (!switchToContentEnabled)
                 return;
 
-            if (AppContextMenus.IsAContextMenuOpen)
+            if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
@@ -196,7 +196,7 @@ namespace TabbedShell
             Debug.WriteLine("MouseEnter");
 
             await Task.Delay(100);
-            if (!AppContextMenus.IsAContextMenuOpen)
+            if (!AppContextMenus.IsAContextMenuOpen && !SettingsWindow.IsOpen)
             {
                 IntPtr foregroundWindow = Win32Functions.GetForegroundWindow();
 
@@ -211,7 +211,7 @@ namespace TabbedShell
             Debug.WriteLine("MouseLeave");
 
             await Task.Delay(100);
-            if (AppContextMenus.IsAContextMenuOpen)
+            if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
