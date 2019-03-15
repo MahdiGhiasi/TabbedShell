@@ -197,7 +197,12 @@ namespace TabbedShell
 
             await Task.Delay(100);
             if (!AppContextMenus.IsAContextMenuOpen)
-                this.Activate();
+            {
+                IntPtr foregroundWindow = Win32Functions.GetForegroundWindow();
+
+                if (foregroundWindow == CurrentContainedWindowHandle)
+                    this.Activate();
+            }
         }
 
         private async void Window_MouseLeave(object sender, MouseEventArgs e)
