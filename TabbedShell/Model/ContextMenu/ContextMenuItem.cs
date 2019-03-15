@@ -9,6 +9,6 @@ namespace TabbedShell.Model.ContextMenu
     public class ContextMenuItem
     {
         public string Text { get; set; }
-        public Action Action { get; set; }
+        public Action<MainWindow> Action { get; set; }
     }
 }

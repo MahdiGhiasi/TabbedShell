@@ -45,6 +45,8 @@ namespace TabbedShell
             TabsList.ItemsSource = Tabs;
             Tabs.CollectionChanged += Tabs_CollectionChanged;
 
+            (App.Current as App).MainWindows.Add(this);
+            
             StartProcess("cmd.exe", "Command Prompt");
         }
 
@@ -212,7 +214,7 @@ namespace TabbedShell
 
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
-            AppContextMenus.GetNewTabContextMenu(this).ShowContextMenu();
+            AppContextMenus.NewTabContextMenu.ShowContextMenu(this);
         }
 
         private void Tab_Click(object sender, RoutedEventArgs e)
@@ -308,9 +310,9 @@ namespace TabbedShell
             }
         }
 
-        private async void ThreeDotsMenu_Click(object sender, RoutedEventArgs e)
+        private void ThreeDotsMenu_Click(object sender, RoutedEventArgs e)
         {
-            AppContextMenus.GetThreeDotContextMenu(this).ShowContextMenu();
+            AppContextMenus.ThreeDotContextMenu.ShowContextMenu(this);
         }
 
         private void Window_Closed(object sender, EventArgs e)

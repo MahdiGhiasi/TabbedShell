@@ -34,6 +34,7 @@ namespace TabbedShell.ContextMenus
         }
 
         Storyboard menuOpenStoryboard, menuCloseStoryboard;
+        private MainWindow ownerWindow;
 
         public ContextMenu()
         {
@@ -76,8 +77,10 @@ namespace TabbedShell.ContextMenus
             SetWindowPosition();
         }
 
-        public async void ShowContextMenu()
+        public async void ShowContextMenu(MainWindow ownerWindow)
         {
+            this.ownerWindow = ownerWindow;
+
             this.Opacity = 0;
             this.Show();
             SetWindowSize();
@@ -98,7 +101,7 @@ namespace TabbedShell.ContextMenus
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             var item = (sender as Control).Tag as ContextMenuItem;
-            item.Action?.Invoke();
+            item.Action?.Invoke(ownerWindow);
         }
 
         private void SetWindowPosition()

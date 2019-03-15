@@ -12,61 +12,75 @@ namespace TabbedShell.ContextMenus
         static ContextMenu threeDotContextMenu = null;
         static ContextMenu newTabContextMenu = null;
 
-        public static ContextMenu GetThreeDotContextMenu(MainWindow ownerWindow)
+        public static ContextMenu ThreeDotContextMenu
         {
-            if (threeDotContextMenu == null)
+            get
             {
-                threeDotContextMenu = new ContextMenu();
-                threeDotContextMenu.Items.Add(new ContextMenuItem
+                if (threeDotContextMenu == null)
                 {
-                    Text = "Settings",
-                    Action = async () =>
+                    threeDotContextMenu = new ContextMenu();
+                    threeDotContextMenu.Items.Add(new ContextMenuItem
                     {
-                        var uri = new Uri("tabbedshellmodern:settings");
-                        await Windows.System.Launcher.LaunchUriAsync(uri);
-                    }
-                });
-            }
+                        Text = "New Window",
+                        Action = (ownerWindow) =>
+                        {
+                            (new MainWindow()).Show();
+                        }
+                    });
+                    threeDotContextMenu.Items.Add(new ContextMenuItem
+                    {
+                        Text = "Settings",
+                        Action = async (ownerWindow) =>
+                        {
+                            var uri = new Uri("tabbedshellmodern:settings");
+                            await Windows.System.Launcher.LaunchUriAsync(uri);
+                        }
+                    });
+                }
 
-            return threeDotContextMenu;
+                return threeDotContextMenu;
+            }
         }
 
-        public static ContextMenu GetNewTabContextMenu(MainWindow ownerWindow)
+        public static ContextMenu NewTabContextMenu
         {
-            if (newTabContextMenu == null)
+            get
             {
-                newTabContextMenu = new ContextMenu
+                if (newTabContextMenu == null)
                 {
-                    Width = 200,
-                };
+                    newTabContextMenu = new ContextMenu
+                    {
+                        Width = 200,
+                    };
 
-                newTabContextMenu.Items.Add(new ContextMenuItem
-                {
-                    Text = "Command Prompt",
-                    Action = () =>
+                    newTabContextMenu.Items.Add(new ContextMenuItem
                     {
-                        ownerWindow.StartProcess("cmd.exe", "Command Prompt");
-                    }
-                });
-                newTabContextMenu.Items.Add(new ContextMenuItem
-                {
-                    Text = "Windows PowerShell",
-                    Action = () =>
+                        Text = "Command Prompt",
+                        Action = (ownerWindow) =>
+                        {
+                            ownerWindow.StartProcess("cmd.exe", "Command Prompt");
+                        }
+                    });
+                    newTabContextMenu.Items.Add(new ContextMenuItem
                     {
-                        ownerWindow.StartProcess("powershell.exe", "PowerShell");
-                    }
-                });
-                newTabContextMenu.Items.Add(new ContextMenuItem
-                {
-                    Text = "Windows Subsystem for Linux",
-                    Action = () =>
+                        Text = "Windows PowerShell",
+                        Action = (ownerWindow) =>
+                        {
+                            ownerWindow.StartProcess("powershell.exe", "PowerShell");
+                        }
+                    });
+                    newTabContextMenu.Items.Add(new ContextMenuItem
                     {
-                        ownerWindow.StartProcess("bash.exe", "Bash");
-                    }
-                });
+                        Text = "Windows Subsystem for Linux",
+                        Action = (ownerWindow) =>
+                        {
+                            ownerWindow.StartProcess("bash.exe", "Bash");
+                        }
+                    });
+                }
+
+                return newTabContextMenu;
             }
-
-            return newTabContextMenu;
         }
 
         public static bool IsAContextMenuOpen

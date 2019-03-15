@@ -13,6 +13,8 @@ namespace TabbedShell
     /// </summary>
     public partial class App : Application
     {
+        public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
+
         protected override void OnStartup(StartupEventArgs e)
         {
             if (e.Args.Length > 0)
