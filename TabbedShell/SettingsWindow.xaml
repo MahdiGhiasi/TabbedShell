@@ -72,7 +72,7 @@
                         Orientation="Horizontal"
                         SmallChange="1"
                         Style="{DynamicResource MahApps.Metro.Styles.Slider.Win10}"
-                        TickPlacement="TopLeft"
+                        TickPlacement="Both"
                         Ticks="40 45 50 55 60 65 70 75 80 85 90"
                         IsSnapToTickEnabled="True"
                         Value="70" />
@@ -80,7 +80,7 @@
                       Height="1"
                       Background="#505050" />
                 <TextBlock Text="TabbedShell"
-                           Margin="0,8,0,0"
+                           Margin="0,12,0,0"
                            FontSize="14"
                            TextWrapping="Wrap" />
                 <TextBlock Text="vX.Y.Z"
