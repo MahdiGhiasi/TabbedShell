@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,6 +39,7 @@ namespace TabbedShell
         Dictionary<IntPtr, MyHost> hosts = new Dictionary<IntPtr, MyHost>();
 
         bool switchToContentEnabled = true;
+        SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
 
         public MainWindow()
         {
@@ -263,29 +265,43 @@ namespace TabbedShell
 
         private async void CloseTab(HostedWindowItem hostedWindowItem)
         {
-            CloseWindowProcess(hostedWindowItem.WindowHandle);
+            await tabCloseSemaphore.WaitAsync();
 
-            var index = Tabs.IndexOf(hostedWindowItem.TabItem);
-            var activeIndex = ActiveTabIndex;
-
-            Tabs[index].Exiting = true;
-
-            SetTabReferenceSize(Tabs.Count - 1);
-
-            if (Tabs.Count == 1)
+            try
             {
-                CloseWindow(sendCloseRequest: true);
-            }
-            else if (activeIndex == index)
-            {
-                if (index == Tabs.Count - 1)
-                    ActivateTab(Tabs.Count - 2);
-                else
-                    ActivateTab(index + 1);
-            }
 
-            await Task.Delay(200);
-            Tabs.RemoveAt(index);
+                CloseWindowProcess(hostedWindowItem.WindowHandle);
+
+                var index = Tabs.IndexOf(hostedWindowItem.TabItem);
+                var activeIndex = ActiveTabIndex;
+
+                Tabs[index].Exiting = true;
+
+                SetTabReferenceSize(Tabs.Count - 1);
+
+                if (Tabs.Count == 1)
+                {
+                    CloseWindow(sendCloseRequest: true);
+                }
+                else if (activeIndex == index)
+                {
+                    if (index == Tabs.Count - 1)
+                        ActivateTab(Tabs.Count - 2);
+                    else
+                        ActivateTab(index + 1);
+                }
+
+                await Task.Delay(200);
+                Tabs.RemoveAt(index);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception in CloseTab: " + ex.ToString());
+            }
+            finally
+            {
+                tabCloseSemaphore.Release();
+            }
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
