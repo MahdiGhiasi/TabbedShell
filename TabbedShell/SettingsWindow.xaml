@@ -13,7 +13,7 @@
                  WindowTitleBrush="Transparent"
                  Title="TabbedShell Settings"
                  ResizeMode="NoResize"
-                 Background="#992B2B2B"
+                 Background="#cc2B2B2B"
                  Height="500" 
                  Width="400">
     <Window.Resources>
