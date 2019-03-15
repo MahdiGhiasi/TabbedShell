@@ -19,14 +19,6 @@
         <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png">
         </uap:DefaultTile>
       </uap:VisualElements>
-      <Extensions>
-        <uap:Extension Category="windows.protocol" Executable="TabbedShellModernUI.exe" EntryPoint="TabbedShellModernUI.App">
-          <uap:Protocol Name="tabbedshellmodern" />
-        </uap:Extension>
-        <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="tabbedshell" />
-        </uap:Extension>
-      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
