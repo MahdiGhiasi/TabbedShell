@@ -23,17 +23,71 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="{x:Type mah:WindowButtonCommands}" BasedOn="{StaticResource MahApps.Metro.Styles.WindowButtonCommands.Win10}" />
+            <Style TargetType="TextBlock">
+                <Style.Setters>
+                    <Setter Property="Foreground" Value="White" />
+                </Style.Setters>
+            </Style>
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid>
-
-        <mah:ToggleSwitch x:Name="enabledSwitch"
-                          Margin="20"
-                          Header="Hey"
-                          IsChecked="True"
-                          OffLabel="No"
-                          OnLabel="Yes"
-                          Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
+    <Grid Background="#2B2B2B">
+        <ScrollViewer>
+            <StackPanel Margin="16,16,16,0">
+                <TextBlock Text="Attach to all terminal windows"
+                           FontSize="14"
+                           TextWrapping="Wrap" />
+                <mah:ToggleSwitch x:Name="attachToAllWindowsToggle"
+                                  Margin="0,8,0,12"
+                                  IsChecked="False"
+                                  OffLabel="   Off"
+                                  OnLabel="   On"
+                                  Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
+                <TextBlock Text="If this option is turned off, Command Prompt and other terminal apps will run without tabs, unless started from TabbedShell."
+                           FontSize="13"
+                           Opacity="0.7"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="Fluent terminal background"
+                           Margin="0,20,0,0"
+                           FontSize="14"
+                           TextWrapping="Wrap" />
+                <mah:ToggleSwitch x:Name="acrylicBackgroundToggle"
+                                  Margin="0,8,0,12"
+                                  IsChecked="True"
+                                  OffLabel="   Off"
+                                  OnLabel="   On"
+                                  Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
+                <TextBlock Text="Background transparency"
+                           Margin="0,20,0,0"
+                           FontSize="14"
+                           TextWrapping="Wrap" />
+                <Slider Margin="0,8,0,0"
+                        Width="300"
+                        HorizontalAlignment="Left"
+                        mah:SliderHelper.EnableMouseWheel="MouseHover"
+                        AutoToolTipPlacement="BottomRight"
+                        LargeChange="10"
+                        Maximum="90"
+                        Minimum="40"
+                        Orientation="Horizontal"
+                        SmallChange="1"
+                        Style="{DynamicResource MahApps.Metro.Styles.Slider.Win10}"
+                        TickPlacement="TopLeft"
+                        Ticks="40 45 50 55 60 65 70 75 80 85 90"
+                        IsSnapToTickEnabled="True"
+                        Value="70" />
+                <Grid Margin="0,40,0,0"
+                      Height="1"
+                      Background="#505050" />
+                <TextBlock Text="TabbedShell"
+                           Margin="0,8,0,0"
+                           FontSize="14"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="vX.Y.Z"
+                           Margin="0,4,0,0"
+                           FontSize="14"
+                           Opacity="0.6" />
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </mah:MetroWindow>
