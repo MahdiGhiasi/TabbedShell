@@ -57,6 +57,18 @@ namespace TabbedShell.Win32.Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyWindow(IntPtr hwnd);
 
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool AttachConsole(uint dwProcessId);
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        public static extern bool FreeConsole();
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern uint GetConsoleProcessList(uint[] ProcessList, uint ProcessCount);
+
+
+
         public static readonly int GWL_STYLE = (-16);
         public static readonly int GWL_EXSTYLE = (-20);
         public static readonly int WS_CHILD = 0x40000000;

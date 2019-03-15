@@ -11,6 +11,8 @@
         MouseLeftButtonUp="Window_MouseLeftButtonUp"
         MouseEnter="Window_MouseEnter"
         MouseLeave="Window_MouseLeave"
+        Closing="Window_Closing"
+        Closed="Window_Closed"
         Background="#55000000"
         Title="MainWindow" 
         WindowStyle="None"
@@ -84,6 +86,11 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="ThreeDotsMenu_Click">
+                        <TextBlock Text="&#xE712;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   TextAlignment="Center" />
+                    </Button>
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="MinimizeWindow_Click">
                         <TextBlock Text="&#xE949;"
                                    FontFamily="Segoe MDL2 Assets"

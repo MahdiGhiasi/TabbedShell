@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TabbedShell.Classes;
+using TabbedShell.ContextMenus;
 using TabbedShell.Helpers;
 using TabbedShell.Model;
 using TabbedShell.Win32.Interop;
@@ -60,12 +61,12 @@ namespace TabbedShell
                 Debug.WriteLine(handle);
             }
 
-            StartCmd();
+            StartProcess("cmd.exe", "Command Prompt");
         }
 
-        private async void StartCmd()
+        public async void StartProcess(string procName, string title = "")
         {
-            var cmd = new ProcessStartInfo("cmd.exe")
+            var cmd = new ProcessStartInfo(procName)
             {
                 WindowStyle = ProcessWindowStyle.Minimized,
                 CreateNoWindow = true,
@@ -74,13 +75,12 @@ namespace TabbedShell
             while (process.MainWindowHandle == IntPtr.Zero)
             {
                 await Task.Delay(10);
-                Debug.WriteLine("Waiting...");
             }
 
             var windowItem = new HostedWindowItem
             {
                 WindowHandle = process.MainWindowHandle,
-                Title = $"Command Prompt {Tabs.Count}",
+                Title = title,
             };
             var tabItem = new Model.UI.TabItem
             {
@@ -120,6 +120,9 @@ namespace TabbedShell
             await Task.Delay(100);
 
             if (!switchToContentEnabled)
+                return;
+
+            if (AppContextMenus.IsAContextMenuOpen)
                 return;
 
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
@@ -185,25 +188,31 @@ namespace TabbedShell
             Window_Activated(this, new EventArgs());
         }
 
-        private void Window_MouseEnter(object sender, MouseEventArgs e)
+        private async void Window_MouseEnter(object sender, MouseEventArgs e)
         {
             switchToContentEnabled = false;
             Debug.WriteLine("MouseEnter");
 
-            this.Activate();
+            await Task.Delay(100);
+            if (!AppContextMenus.IsAContextMenuOpen)
+                this.Activate();
         }
 
-        private void Window_MouseLeave(object sender, MouseEventArgs e)
+        private async void Window_MouseLeave(object sender, MouseEventArgs e)
         {
             switchToContentEnabled = true;
             Debug.WriteLine("MouseLeave");
+
+            await Task.Delay(100);
+            if (AppContextMenus.IsAContextMenuOpen)
+                return;
 
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
-            StartCmd();
+            AppContextMenus.GetNewTabContextMenu(this).ShowContextMenu();
         }
 
         private void Tab_Click(object sender, RoutedEventArgs e)
@@ -230,7 +239,7 @@ namespace TabbedShell
 
             if (Tabs.Count == 0)
             {
-                CloseWindow();
+                CloseWindow(sendCloseRequest: true);
             }
             else if (activeIndex == index)
             {
@@ -240,17 +249,23 @@ namespace TabbedShell
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
         {
-            CloseWindow();
+            this.Close();
         }
 
-        private void CloseWindow()
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            CloseWindow(sendCloseRequest: false);
+        }
+
+        private void CloseWindow(bool sendCloseRequest)
         {
             foreach (var tab in Tabs)
             {
                 CloseWindowProcess(tab.HostedWindowItem.WindowHandle);
             }
 
-            this.Close();
+            if (sendCloseRequest)
+                this.Close();
         }
 
         private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
@@ -265,12 +280,42 @@ namespace TabbedShell
 
         private void CloseWindowProcess(IntPtr windowHandle)
         {
-            Win32Functions.GetWindowThreadProcessId(windowHandle, out uint processId);
-            var process = Process.GetProcessById((int)processId);
+            var myProcId = Process.GetCurrentProcess().Id;
 
-            // TODO: Kill child processes as well (When cmd runs another cmd or bash inside itself)
+            Win32Functions.GetWindowThreadProcessId(windowHandle, out uint consoleRootProcessId);
 
-            process.Kill();
+            // https://stackoverflow.com/a/28616832/942659
+            // TODO: Create console event handler for reliability
+
+            Win32Functions.AttachConsole(consoleRootProcessId);
+            uint[] procIds = new uint[1024];
+            Win32Functions.GetConsoleProcessList(procIds, 1024);
+            Win32Functions.FreeConsole();
+
+            foreach (var procId in procIds)
+            {
+                if (procId == 0)
+                    continue;
+                if (procId == myProcId)
+                    continue;
+
+                var process = Process.GetProcessById((int)procId);
+                try
+                {
+                    process.Kill();
+                }
+                catch { }
+            }
+        }
+
+        private async void ThreeDotsMenu_Click(object sender, RoutedEventArgs e)
+        {
+            AppContextMenus.GetThreeDotContextMenu(this).ShowContextMenu();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            AppContextMenus.Close();
         }
     }
 }
