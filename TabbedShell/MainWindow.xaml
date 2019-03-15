@@ -23,11 +23,6 @@
                       ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
 
-    <Window.Resources>
-        <ResourceDictionary>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <Border BorderThickness="0.5" BorderBrush="#88444444">
         <Grid>
             <Grid.RowDefinitions>
