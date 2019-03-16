@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace TabbedShell.Model.UI
 {
-    public class TabItem : INotifyPropertyChanged
+    public class TabItem : ModelBase
     {
         public HostedWindowItem HostedWindowItem { get; set; }
         public string Title => HostedWindowItem.Title;
@@ -52,13 +52,6 @@ namespace TabbedShell.Model.UI
 
                 return new SolidColorBrush(Colors.Transparent);
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void NotifyPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

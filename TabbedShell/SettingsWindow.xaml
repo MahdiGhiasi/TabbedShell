@@ -43,7 +43,7 @@
                            TextWrapping="Wrap" />
                 <mah:ToggleSwitch x:Name="attachToAllWindowsToggle"
                                   Margin="0,8,0,12"
-                                  IsChecked="False"
+                                  IsChecked="{Binding AttachToAllTerminalsEnabled}"
                                   OffLabel="   Off"
                                   OnLabel="   On"
                                   Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
@@ -57,7 +57,7 @@
                            TextWrapping="Wrap" />
                 <mah:ToggleSwitch x:Name="acrylicBackgroundToggle"
                                   Margin="0,8,0,12"
-                                  IsChecked="True"
+                                  IsChecked="{Binding TransparentTerminalEnabled}"
                                   OffLabel="   Off"
                                   OnLabel="   On"
                                   Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
@@ -79,7 +79,7 @@
                         TickPlacement="Both"
                         Ticks="40 45 50 55 60 65 70 75 80 85 90"
                         IsSnapToTickEnabled="True"
-                        Value="70" />
+                        Value="{Binding TerminalTransparencyAmount}" />
                 <TextBlock Text="New tab button click behavior"
                            Margin="0,24,0,0"
                            FontSize="14"
@@ -88,11 +88,11 @@
                           Margin="0,8,0,0"
                           HorizontalAlignment="Left"
                           BorderThickness="1"
-                          SelectedIndex="0">
+                          SelectedIndex="{Binding NewTabBehaviorSelectedIndex}">
+                    <ComboBoxItem Content="Open context menu" />
                     <ComboBoxItem Content="New Command Prompt tab" />
                     <ComboBoxItem Content="New PowerShell tab" />
                     <ComboBoxItem Content="New Windows Subsystem for Linux tab" />
-                    <ComboBoxItem Content="Open context menu" />
                 </ComboBox>
                 <TextBlock Text="Right clicking on new tab button always opens the context menu."
                            Margin="0,8,0,0"

@@ -236,7 +236,10 @@ namespace TabbedShell
 
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
-            AppContextMenus.NewTabContextMenu.ShowContextMenu(this);
+            if (Properties.Settings.Default.NewTabDefaultIndex == 0)
+                AppContextMenus.NewTabContextMenu.ShowContextMenu(this);
+            else
+                AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1].Action?.Invoke(this);
         }
 
         private void Tab_Click(object sender, RoutedEventArgs e)

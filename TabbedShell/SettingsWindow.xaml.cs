@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TabbedShell.Helpers;
+using TabbedShell.Model.UI;
 
 namespace TabbedShell
 {
@@ -22,9 +23,14 @@ namespace TabbedShell
     {
         private static SettingsWindow instance = null;
 
+        SettingsModel model;
+
         private SettingsWindow()
         {
             InitializeComponent();
+
+            model = new SettingsModel();
+            this.DataContext = model;
         }
 
         public static bool IsOpen => instance != null;

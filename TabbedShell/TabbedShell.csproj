@@ -92,6 +92,8 @@
     <Compile Include="Helpers\AcrylicBlurHelper.cs" />
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />
     <Compile Include="Model\HostedWindowItem.cs" />
+    <Compile Include="Model\UI\ModelBase.cs" />
+    <Compile Include="Model\UI\SettingsModel.cs" />
     <Compile Include="Model\UI\TabItem.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
