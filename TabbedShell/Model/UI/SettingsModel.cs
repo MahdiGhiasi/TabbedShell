@@ -85,5 +85,13 @@ namespace TabbedShell.Model.UI
                 NotifyPropertyChanged(nameof(NewTabBehaviorSelectedIndex));
             }
         }
+
+        public string AppVersion
+        {
+            get
+            {
+                return "v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
     }
 }
