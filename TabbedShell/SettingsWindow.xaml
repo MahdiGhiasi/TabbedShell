@@ -47,7 +47,7 @@
                                   OffLabel="   Off"
                                   OnLabel="   On"
                                   Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
-                <TextBlock Text="If this option is turned off, Command Prompt and other terminal apps will run without tabs, unless started from TabbedShell."
+                <TextBlock Text="If you turn this on, Command Prompt and other shells will open in TabbedShell automatically."
                            FontSize="13"
                            Opacity="0.7"
                            TextWrapping="Wrap" />
