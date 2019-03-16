@@ -49,6 +49,11 @@ namespace TabbedShell.Controls
             tabs.CollectionChanged += Tabs_CollectionChanged;
         }
 
+        public void ActivateTab(Model.UI.TabItem tabItem)
+        {
+            ActivateTab(tabs.IndexOf(tabItem));
+        }
+
         public void ActivateTab(int index)
         {
             for (int i = 0; i < tabs.Count; i++)
@@ -187,17 +192,34 @@ namespace TabbedShell.Controls
             tabMouseDownPosition = null;
         }
 
-        private void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
+        private async void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed)
             {
                 if (tabMouseDownPosition.HasValue && Point.Subtract(e.GetPosition(FindMyWindow()), tabMouseDownPosition.Value).Length > _minLengthForDrag)
                 {
-                    ListBoxItem draggedItem = sender as ListBoxItem;
-                    (draggedItem.Content as Model.UI.TabItem).Exiting = true;
+                    var draggedItem = sender as ListBoxItem;
+                    var tabItem = draggedItem.Content as Model.UI.TabItem;
 
+                    if (tabItem == null)
+                        return;
+
+                    tabItem.Exiting = true;
+
+                    if (tabs.IndexOf(tabItem) == ActiveTabIndex)
+                    {
+                        if (ActiveTabIndex == tabs.Count - 1)
+                            ActivateTab(tabs.Count - 2);
+                        else
+                            ActivateTab(ActiveTabIndex + 1);
+                    }
+
+                    // Make sure UI updates with new tab activations, before being blocked by DoDragDrop
+                    await Task.Delay(10); 
+                    
                     // This function is blocking. The rest of the code run after drop event
                     DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+
 
                     // TODO: When dropped outside, tab disappears. (Exiting remains true)
                 }
@@ -227,6 +249,7 @@ namespace TabbedShell.Controls
             }
 
             droppedData.ContainingTabHeader = this;
+            ActivateTab(droppedData);
         }
 
         private void UserControl_Drop(object sender, DragEventArgs e)
@@ -242,6 +265,7 @@ namespace TabbedShell.Controls
             tabs.Add(droppedData);
 
             droppedData.ContainingTabHeader = this;
+            ActivateTab(droppedData);
         }
     }
 
