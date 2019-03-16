@@ -50,8 +50,24 @@ namespace TabbedShell.Model.UI
             get
             {
                 if (IsActive)
-                    return new SolidColorBrush(Color.FromArgb(255, 35, 35, 35));
+                    return TabActiveBackColor;
 
+                return TabDeactiveBackColor;
+            }
+        }
+
+        public Brush TabActiveBackColor
+        {
+            get
+            {
+                return new SolidColorBrush(Color.FromArgb(255, 35, 35, 35));
+            }
+        }
+
+        public Brush TabDeactiveBackColor
+        {
+            get
+            {
                 return new SolidColorBrush(Colors.Transparent);
             }
         }

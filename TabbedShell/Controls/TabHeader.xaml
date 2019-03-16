@@ -39,6 +39,7 @@
                         <EventSetter Event="PreviewMouseMove" Handler="TabsList_PreviewMouseMove"/>
                         <EventSetter Event="Drop" Handler="TabsList_Drop"/>
                         <EventSetter Event="GiveFeedback" Handler="TabsList_GiveFeedback"/>
+                        <EventSetter Event="QueryContinueDrag" Handler="TabsList_QueryContinueDrag"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>

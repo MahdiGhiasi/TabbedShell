@@ -71,6 +71,10 @@ namespace TabbedShell.Win32.Interop
         public static extern uint GetConsoleProcessList(uint[] ProcessList, uint ProcessCount);
 
 
+        [DllImport("User32.dll")]
+        public static extern Int64 SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        public const int WmPaint = 0x000F;
 
         public static readonly int GWL_STYLE = (-16);
         public static readonly int GWL_EXSTYLE = (-20);

@@ -20,6 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TabbedShell.Classes;
 using TabbedShell.ContextMenus;
+using TabbedShell.Controls;
 using TabbedShell.Helpers;
 using TabbedShell.Model;
 using TabbedShell.Win32.Interop;
@@ -88,6 +89,8 @@ namespace TabbedShell
                 windowItem.TabItem = tabItem;
 
                 TabsContainer.AddTab(tabItem);
+
+                this.ForcePaint();
             }));
         }
 
@@ -277,7 +280,10 @@ namespace TabbedShell
             (App.Current as App).MainWindows.Remove(this);
 
             if ((App.Current as App).MainWindows.Count == 0)
+            {
+                TabHeader.DisposeFloatingDragDropThread();
                 Application.Current.Shutdown();
+            }
         }
 
         private void TabsContainer_TabActivated(object sender, Controls.TabActivatedEventArgs e)
@@ -296,11 +302,11 @@ namespace TabbedShell
 
         private void TabsContainer_TabNewWindowRequested(object sender, Controls.TabNewWindowRequestEventArgs e)
         {
-            var newWindow = new MainWindow(e.Tab.HostedWindowItem.WindowHandle, e.Tab.Title);
-            var point = System.Windows.Forms.Cursor.Position;
-
-            newWindow.Left = point.X - 30;
-            newWindow.Top = point.Y - 15;
+            var newWindow = new MainWindow(e.Tab.HostedWindowItem.WindowHandle, e.Tab.Title)
+            {
+                Left = e.Position.X,
+                Top = e.Position.Y,
+            };
 
             newWindow.Show();
         }
