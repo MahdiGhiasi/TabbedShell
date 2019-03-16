@@ -308,7 +308,6 @@ namespace TabbedShell
             if ((App.Current as App).MainWindows.Count == 0)
             {
                 TabHeader.DisposeFloatingDragDropThread();
-                (Application.Current as App).ReleaseMutex();
                 Application.Current.Shutdown();
             }
         }

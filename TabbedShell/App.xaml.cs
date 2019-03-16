@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,50 +36,48 @@ namespace TabbedShell
         /// <param name="e">The e.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            bool isOwned;
-            this.mutex = new Mutex(true, UniqueMutexName, out isOwned);
+            this.mutex = new Mutex(false, UniqueMutexName);
             this.eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, UniqueEventName);
 
             // So, R# would not give a warning that this variable is not used.
             GC.KeepAlive(this.mutex);
 
-            if (isOwned)
+            try
             {
-                // Spawn a thread which will be waiting for our event
-                var thread = new Thread(
-                    () =>
-                    {
-                        while (this.eventWaitHandle.WaitOne())
-                        {
-                            Current.Dispatcher.BeginInvoke(
-                                (Action)(() =>
-                                {
-                                    (new MainWindow()).Show();
-                                }));
-                        }
-                    });
+                if (!mutex.WaitOne(TimeSpan.FromSeconds(1), false))
+                {
+                    // Notify other instance so it could bring itself to foreground.
+                    this.eventWaitHandle.Set();
 
-                // It is important mark it as background otherwise it will prevent app from exiting.
-                thread.IsBackground = true;
-
-                thread.Start();
-
-
-                InitWindowTitleCheckTimer();
-
-                return;
+                    // Terminate this instance.
+                    this.Shutdown();
+                }
+            }
+            catch (AbandonedMutexException ex)
+            {
+                Debug.WriteLine(ex.ToString());
             }
 
-            // Notify other instance so it could bring itself to foreground.
-            this.eventWaitHandle.Set();
 
-            // Terminate this instance.
-            this.Shutdown();
-        }
+            // Spawn a thread which will be waiting for our event
+            var thread = new Thread(() =>
+            {
+                while (this.eventWaitHandle.WaitOne())
+                {
+                    Current.Dispatcher.BeginInvoke(
+                        (Action)(() =>
+                        {
+                            (new MainWindow()).Show();
+                        }));
+                }
+            });
 
-        public void ReleaseMutex()
-        {
-            mutex.ReleaseMutex();
+            // It is important mark it as background otherwise it will prevent app from exiting.
+            thread.IsBackground = true;
+            thread.Start();
+
+
+            InitWindowTitleCheckTimer();
         }
 
         private void InitWindowTitleCheckTimer()
