@@ -214,22 +214,15 @@ namespace TabbedShell.Controls
 
             droppedData.Exiting = false;
 
-            int removedIdx = tabs.IndexOf(droppedData);
-            int targetIdx = tabs.IndexOf(target);
-
             if (addNext)
             {
-                tabs.Insert(targetIdx + 1, droppedData);
-                tabs.RemoveAt(removedIdx);
+                tabs.Remove(droppedData);
+                tabs.Insert(tabs.IndexOf(target) + 1, droppedData);
             }
             else
             {
-                int remIdx = removedIdx + 1;
-                if (tabs.Count + 1 > remIdx)
-                {
-                    tabs.Insert(targetIdx, droppedData);
-                    tabs.RemoveAt(remIdx);
-                }
+                tabs.Remove(droppedData);
+                tabs.Insert(tabs.IndexOf(target), droppedData);
             }
         }
 
@@ -242,10 +235,8 @@ namespace TabbedShell.Controls
 
             droppedData.Exiting = false;
 
-            int removedIdx = tabs.IndexOf(droppedData);
-
+            tabs.Remove(droppedData);
             tabs.Add(droppedData);
-            tabs.RemoveAt(removedIdx);
         }
     }
 
