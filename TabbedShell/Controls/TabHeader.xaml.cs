@@ -62,6 +62,7 @@ namespace TabbedShell.Controls
 
         public void AddTab(Model.UI.TabItem tabItem)
         {
+            tabItem.ContainingTabHeader = this;
             tabs.Add(tabItem);
             ActivateTab(tabs.Count - 1);
         }
@@ -216,14 +217,16 @@ namespace TabbedShell.Controls
 
             if (addNext)
             {
-                tabs.Remove(droppedData);
+                droppedData.ContainingTabHeader.tabs.Remove(droppedData);
                 tabs.Insert(tabs.IndexOf(target) + 1, droppedData);
             }
             else
             {
-                tabs.Remove(droppedData);
+                droppedData.ContainingTabHeader.tabs.Remove(droppedData);
                 tabs.Insert(tabs.IndexOf(target), droppedData);
             }
+
+            droppedData.ContainingTabHeader = this;
         }
 
         private void UserControl_Drop(object sender, DragEventArgs e)
@@ -235,8 +238,10 @@ namespace TabbedShell.Controls
 
             droppedData.Exiting = false;
 
-            tabs.Remove(droppedData);
+            droppedData.ContainingTabHeader.tabs.Remove(droppedData);
             tabs.Add(droppedData);
+
+            droppedData.ContainingTabHeader = this;
         }
     }
 

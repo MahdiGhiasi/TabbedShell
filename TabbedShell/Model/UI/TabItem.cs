@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using TabbedShell.Controls;
 
 namespace TabbedShell.Model.UI
 {
@@ -53,5 +55,7 @@ namespace TabbedShell.Model.UI
                 return new SolidColorBrush(Colors.Transparent);
             }
         }
+
+        public TabHeader ContainingTabHeader { get; set; }
     }
 }

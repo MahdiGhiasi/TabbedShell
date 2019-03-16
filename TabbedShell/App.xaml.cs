@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using TabbedShell.Classes;
 
 namespace TabbedShell
 {
@@ -15,6 +16,7 @@ namespace TabbedShell
     public partial class App : Application
     {
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
+        public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
 
         // Single instance and notifying the previous instance obtained from https://stackoverflow.com/a/23730146/942659
 

@@ -32,8 +32,6 @@ namespace TabbedShell
     /// </summary>
     public partial class MainWindow : Window
     {
-        Dictionary<IntPtr, MyHost> hosts = new Dictionary<IntPtr, MyHost>();
-
         bool switchToContentEnabled = true;
 
         public MainWindow()
@@ -112,14 +110,14 @@ namespace TabbedShell
         private async void ContainTargetWindow(IntPtr target)
         {
             MyHost host;
-            if (hosts.ContainsKey(target))
+            if ((App.Current as App).TargetWindowHosts.ContainsKey(target))
             {
-                host = hosts[target];
+                host = (App.Current as App).TargetWindowHosts[target];
             }
             else
             {
                 host = new MyHost(target);
-                hosts[target] = host;
+                (App.Current as App).TargetWindowHosts[target] = host;
             }
 
             WindowContainer.Child = host;
