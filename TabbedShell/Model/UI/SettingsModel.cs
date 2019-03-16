@@ -36,6 +36,8 @@ namespace TabbedShell.Model.UI
                 Properties.Settings.Default.Save();
 
                 NotifyPropertyChanged(nameof(TransparentTerminalEnabled));
+                NotifyPropertyChanged(nameof(TransparentTerminalSectionOpacity));
+                NotifyOpacitySettingChangedToMainWindows();
             }
         }
 
@@ -43,14 +45,29 @@ namespace TabbedShell.Model.UI
         {
             get
             {
-                return Properties.Settings.Default.TerminalTransparencyAmount;
+                return Properties.Settings.Default.TerminalTransparencyAmount * 100;
             }
             set
             {
-                Properties.Settings.Default.TerminalTransparencyAmount = value;
+                Properties.Settings.Default.TerminalTransparencyAmount = value / 100.0;
                 Properties.Settings.Default.Save();
 
                 NotifyPropertyChanged(nameof(TerminalTransparencyAmount));
+                NotifyOpacitySettingChangedToMainWindows();
+            }
+        }
+
+        private static void NotifyOpacitySettingChangedToMainWindows()
+        {
+            foreach (var item in (App.Current as App).MainWindows)
+                item.WindowOpacityUpdated();
+        }
+
+        public double TransparentTerminalSectionOpacity
+        {
+            get
+            {
+                return TransparentTerminalEnabled ? 1.0 : 0.5;
             }
         }
 

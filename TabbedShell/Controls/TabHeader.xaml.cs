@@ -30,7 +30,6 @@ namespace TabbedShell.Controls
     {
         public IReadOnlyList<Model.UI.TabItem> Tabs => tabs;
         public int ActiveTabIndex => tabs.IndexOf(tabs.FirstOrDefault(x => x.IsActive));
-        public IntPtr CurrentContainedWindowHandle => ActiveTabIndex == -1 ? IntPtr.Zero : tabs[ActiveTabIndex].HostedWindowItem.WindowHandle;
 
         public event EventHandler<TabActivatedEventArgs> TabActivated;
         public event EventHandler<TabCloseEventArgs> TabClosing;
