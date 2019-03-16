@@ -76,7 +76,7 @@ namespace TabbedShell
             this.Shutdown();
         }
 
-        protected override void OnExit(ExitEventArgs e)
+        public void ReleaseMutex()
         {
             mutex.ReleaseMutex();
         }
