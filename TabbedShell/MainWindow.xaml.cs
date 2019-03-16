@@ -36,11 +36,18 @@ namespace TabbedShell
 
         public MainWindow()
         {
-            InitializeComponent();           
-
+            InitializeComponent();
             (App.Current as App).MainWindows.Add(this);
 
             Task.Run(() => StartProcess("cmd.exe", "Command Prompt"));
+        }
+
+        public MainWindow(IntPtr windowHandle, string title)
+        {
+            InitializeComponent();
+            (App.Current as App).MainWindows.Add(this);
+
+            CreateTabForWindow(windowHandle, title);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -61,11 +68,16 @@ namespace TabbedShell
                 await Task.Delay(10);
             }
 
+            await CreateTabForWindow(process.MainWindowHandle, title);
+        }
+
+        private async Task CreateTabForWindow(IntPtr handle, string title)
+        {
             await Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, (Action)(() =>
             {
                 var windowItem = new HostedWindowItem
                 {
-                    WindowHandle = process.MainWindowHandle,
+                    WindowHandle = handle,
                     Title = title,
                 };
                 var tabItem = new Model.UI.TabItem
@@ -279,6 +291,37 @@ namespace TabbedShell
             if (e.RemainingTabs == 0)
             {
                 CloseWindow(sendCloseRequest: true);
+            }
+        }
+
+        private void TabsContainer_TabNewWindowRequested(object sender, Controls.TabNewWindowRequestEventArgs e)
+        {
+            var newWindow = new MainWindow(e.Tab.HostedWindowItem.WindowHandle, e.Tab.Title);
+            var point = System.Windows.Forms.Cursor.Position;
+
+            newWindow.Left = point.X - 30;
+            newWindow.Top = point.Y - 15;
+
+            newWindow.Show();
+        }
+
+        private void TabsContainer_TabDragBegin(object sender, EventArgs e)
+        {
+            if (TabsContainer.Tabs.Count == 1)
+            {
+                Debug.WriteLine("bye?");
+                this.Hide();
+
+                WindowContainer.Child = null;
+            }
+        }
+
+        private void TabsContainer_TabDragEnd(object sender, EventArgs e)
+        {
+            if (TabsContainer.Tabs.Count == 0)
+            {
+                Debug.WriteLine("goodbye :(");
+                this.Close();
             }
         }
     }

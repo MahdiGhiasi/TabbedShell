@@ -39,6 +39,9 @@
                 <controls:TabHeader x:Name="TabsContainer" 
                                     TabClosing="TabsContainer_TabClosing"
                                     TabActivated="TabsContainer_TabActivated"
+                                    TabNewWindowRequested="TabsContainer_TabNewWindowRequested"
+                                    TabDragBegin="TabsContainer_TabDragBegin"
+                                    TabDragEnd="TabsContainer_TabDragEnd"
                                     Grid.Column="0" />
                 <StackPanel Orientation="Horizontal" Grid.Column="2">
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="ThreeDotsMenu_Click">

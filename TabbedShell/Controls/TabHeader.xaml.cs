@@ -16,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using TabbedShell.ContextMenus;
 using TabbedShell.Model;
 using TabbedShell.Model.UI;
@@ -34,6 +35,9 @@ namespace TabbedShell.Controls
         public event EventHandler<TabActivatedEventArgs> TabActivated;
         public event EventHandler<TabCloseEventArgs> TabClosing;
         public event EventHandler<TabCloseEventArgs> TabClosed;
+        public event EventHandler<TabNewWindowRequestEventArgs> TabNewWindowRequested;
+        public event EventHandler TabDragBegin;
+        public event EventHandler TabDragEnd;
 
         private ObservableCollection<Model.UI.TabItem> tabs { get; } = new ObservableCollection<Model.UI.TabItem>();
         SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
@@ -56,6 +60,9 @@ namespace TabbedShell.Controls
 
         public void ActivateTab(int index)
         {
+            if (index < 0 || index >= tabs.Count)
+                return;
+
             for (int i = 0; i < tabs.Count; i++)
                 tabs[i].IsActive = (i == index);
 
@@ -205,6 +212,7 @@ namespace TabbedShell.Controls
                         return;
 
                     tabItem.Exiting = true;
+                    tabItem.DragAndDropping = true;
 
                     if (tabs.IndexOf(tabItem) == ActiveTabIndex)
                     {
@@ -214,14 +222,27 @@ namespace TabbedShell.Controls
                             ActivateTab(ActiveTabIndex + 1);
                     }
 
+                    TabDragBegin?.Invoke(this, new EventArgs());
+
                     // Make sure UI updates with new tab activations, before being blocked by DoDragDrop
                     await Task.Delay(10); 
                     
                     // This function is blocking. The rest of the code run after drop event
                     DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
 
+                    await Task.Delay(100);
+                    if (tabItem.Exiting && tabItem.DragAndDropping)
+                    {
+                        // Dropped outside
+                        tabItem.DragAndDropping = false;
+                        tabs.Remove(tabItem);
+                        TabNewWindowRequested?.Invoke(this, new TabNewWindowRequestEventArgs
+                        {
+                            Tab = tabItem,
+                        });
+                    }
 
-                    // TODO: When dropped outside, tab disappears. (Exiting remains true)
+                    TabDragEnd?.Invoke(this, new EventArgs());
                 }
             }
         }
@@ -235,6 +256,10 @@ namespace TabbedShell.Controls
 
             var addNext = (e.GetPosition((ListBoxItem)sender).X > ((ListBoxItem)sender).ActualWidth / 2);
 
+            if (!droppedData.DragAndDropping)
+                return;
+
+            droppedData.DragAndDropping = false;
             droppedData.Exiting = false;
 
             if (addNext)
@@ -259,6 +284,10 @@ namespace TabbedShell.Controls
             if (droppedData == null)
                 return;
 
+            if (!droppedData.DragAndDropping)
+                return;
+
+            droppedData.DragAndDropping = false;
             droppedData.Exiting = false;
 
             droppedData.ContainingTabHeader.tabs.Remove(droppedData);
@@ -267,6 +296,17 @@ namespace TabbedShell.Controls
             droppedData.ContainingTabHeader = this;
             ActivateTab(droppedData);
         }
+
+        private void TabsList_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        {
+            e.UseDefaultCursors = false;
+            Mouse.SetCursor(Cursors.Hand);
+        }
+    }
+
+    public class TabNewWindowRequestEventArgs
+    {
+        public Model.UI.TabItem Tab { get; set; }
     }
 
     public class TabCloseEventArgs
