@@ -94,6 +94,7 @@
                                         MouseUp="Tab_MouseUp"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch"
+                                        ToolTip="{Binding Title, Mode=OneWay}"
                                         Tag="{Binding HostedWindowItem, Mode=OneWay}">
                                     <TextBlock Text="{Binding Title, Mode=OneWay}"
                                                Margin="8,0,0,0"
