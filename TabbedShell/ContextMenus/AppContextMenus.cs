@@ -58,7 +58,7 @@ namespace TabbedShell.ContextMenus
                         Text = "Command Prompt",
                         Action = (ownerWindow) =>
                         {
-                            (ownerWindow as MainWindow).StartProcess("cmd.exe", "Command Prompt");
+                            (ownerWindow as MainWindow).StartProcess("cmd.exe");
                         }
                     });
                     newTabContextMenu.Items.Add(new ContextMenuItem
@@ -66,7 +66,7 @@ namespace TabbedShell.ContextMenus
                         Text = "Windows PowerShell",
                         Action = (ownerWindow) =>
                         {
-                            (ownerWindow as MainWindow).StartProcess("powershell.exe", "PowerShell");
+                            (ownerWindow as MainWindow).StartProcess("powershell.exe");
                         }
                     });
                     newTabContextMenu.Items.Add(new ContextMenuItem
@@ -74,7 +74,7 @@ namespace TabbedShell.ContextMenus
                         Text = "Windows Subsystem for Linux",
                         Action = (ownerWindow) =>
                         {
-                            (ownerWindow as MainWindow).StartProcess("bash.exe", "Bash");
+                            (ownerWindow as MainWindow).StartProcess("bash.exe");
                         }
                     });
                 }

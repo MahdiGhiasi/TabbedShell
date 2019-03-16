@@ -33,19 +33,32 @@ namespace TabbedShell
     /// </summary>
     public partial class MainWindow : Window
     {
+        public IntPtr CurrentContainedWindowHandle => TabsContainer.ActiveTabIndex == -1 ? IntPtr.Zero : TabsContainer.Tabs[TabsContainer.ActiveTabIndex].HostedWindowItem.WindowHandle;
+
         bool switchToContentEnabled = true;
 
+        static int counter;
         public MainWindow()
         {
             InitializeComponent();
+            counter++;
+            this.Title = counter.ToString();
             (App.Current as App).MainWindows.Add(this);
 
-            Task.Run(() => StartProcess("cmd.exe", "Command Prompt"));
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, (Action)(() =>
+            {
+                if (Properties.Settings.Default.NewTabDefaultIndex == 0)
+                    StartProcess("cmd.exe");
+                else
+                    AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1].Action?.Invoke(this);
+            }));
         }
 
         public MainWindow(IntPtr windowHandle, string title)
         {
             InitializeComponent();
+            counter++;
+            this.Title = counter.ToString();
             (App.Current as App).MainWindows.Add(this);
 
             CreateTabForWindow(windowHandle, title);
@@ -56,7 +69,7 @@ namespace TabbedShell
             this.EnableAcrylicBlur();
         }
 
-        public async void StartProcess(string procName, string title = "")
+        public async void StartProcess(string procName)
         {
             var cmd = new ProcessStartInfo(procName)
             {
@@ -69,7 +82,7 @@ namespace TabbedShell
                 await Task.Delay(10);
             }
 
-            await CreateTabForWindow(process.MainWindowHandle, title);
+            await CreateTabForWindow(process.MainWindowHandle, DefaultWindowNames.GetName(procName));
         }
 
         private async Task CreateTabForWindow(IntPtr handle, string title)
@@ -97,14 +110,28 @@ namespace TabbedShell
         private void AttachToWindow(IntPtr handle)
         {
             ContainTargetWindow(handle);
-            SetWindowOpacity(handle, 0.65);
+            if (Properties.Settings.Default.TransparentTerminalEnabled)
+            {
+                SetWindowOpacity(CurrentContainedWindowHandle, Properties.Settings.Default.TerminalTransparencyAmount);
+            }
         }
-
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
         {
             Win32Functions.SetWindowLongPtr(new HandleRef(this, containedWindowHandle), Win32Functions.GWL_EXSTYLE, new IntPtr(Win32Functions.GetWindowLongPtr(containedWindowHandle, Win32Functions.GWL_EXSTYLE).ToInt32() | Win32Functions.WS_EX_LAYERED));
             Win32Functions.SetLayeredWindowAttributes(containedWindowHandle, 0, (byte)(opacity * 255), Win32Functions.LWA_ALPHA);
+        }
+
+        public void WindowOpacityUpdated()
+        {
+            if (Properties.Settings.Default.TransparentTerminalEnabled)
+            {
+                SetWindowOpacity(CurrentContainedWindowHandle, Properties.Settings.Default.TerminalTransparencyAmount);
+            }
+            else
+            {
+                SetWindowOpacity(CurrentContainedWindowHandle, 1.0);
+            }
         }
 
         private async void Window_Activated(object sender, EventArgs e)
@@ -119,7 +146,7 @@ namespace TabbedShell
             if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
-            Win32Functions.SetForegroundWindow(TabsContainer.CurrentContainedWindowHandle);
+            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private async void ContainTargetWindow(IntPtr target)
@@ -192,7 +219,7 @@ namespace TabbedShell
             {
                 IntPtr foregroundWindow = Win32Functions.GetForegroundWindow();
 
-                if (foregroundWindow == TabsContainer.CurrentContainedWindowHandle)
+                if (foregroundWindow == CurrentContainedWindowHandle)
                     this.Activate();
             }
         }
@@ -206,7 +233,7 @@ namespace TabbedShell
             if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
-            Win32Functions.SetForegroundWindow(TabsContainer.CurrentContainedWindowHandle);
+            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)

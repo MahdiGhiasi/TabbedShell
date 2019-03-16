@@ -95,6 +95,7 @@
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AcrylicBlurHelper.cs" />
+    <Compile Include="Helpers\DefaultWindowNames.cs" />
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />
     <Compile Include="Model\HostedWindowItem.cs" />
     <Compile Include="Model\UI\ModelBase.cs" />
