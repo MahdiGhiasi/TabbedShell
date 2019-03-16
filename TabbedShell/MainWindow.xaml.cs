@@ -387,8 +387,9 @@ namespace TabbedShell
             {
                 ListBoxItem draggedItem = sender as ListBoxItem;
                 (draggedItem.Content as Model.UI.TabItem).Exiting = true;
+
+                // This function is blocking. The rest of the code run after drop event
                 DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
-                draggedItem.IsSelected = true;
 
                 // TODO: When dropped outside, tab disappears. (Exiting remains true)
             }
