@@ -34,7 +34,7 @@ namespace TabbedShell.ContextMenus
         }
 
         Storyboard menuOpenStoryboard, menuCloseStoryboard;
-        private MainWindow ownerWindow;
+        private Window ownerWindow;
 
         public ContextMenu()
         {
@@ -77,7 +77,7 @@ namespace TabbedShell.ContextMenus
             SetWindowPosition();
         }
 
-        public async void ShowContextMenu(MainWindow ownerWindow)
+        public async void ShowContextMenu(Window ownerWindow)
         {
             this.ownerWindow = ownerWindow;
 

@@ -89,6 +89,9 @@
       <DependentUpon>ContextMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContextMenus\AppContextMenus.cs" />
+    <Compile Include="Controls\TabHeader.xaml.cs">
+      <DependentUpon>TabHeader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\AcrylicBlurHelper.cs" />
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />
     <Compile Include="Model\HostedWindowItem.cs" />
@@ -103,6 +106,10 @@
     <Compile Include="Win32\Interop\Win32Functions.cs" />
     <Compile Include="Win32\Structs\WINDOWPLACEMENT.cs" />
     <Page Include="ContextMenus\ContextMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TabHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -32,47 +32,17 @@ namespace TabbedShell
     /// </summary>
     public partial class MainWindow : Window
     {
-        ObservableCollection<Model.UI.TabItem> Tabs { get; } = new ObservableCollection<Model.UI.TabItem>();
-        int ActiveTabIndex => Tabs.IndexOf(Tabs.FirstOrDefault(x => x.IsActive));
-        IntPtr CurrentContainedWindowHandle => ActiveTabIndex == -1 ? IntPtr.Zero : Tabs[ActiveTabIndex].HostedWindowItem.WindowHandle;
-
         Dictionary<IntPtr, MyHost> hosts = new Dictionary<IntPtr, MyHost>();
 
         bool switchToContentEnabled = true;
-        SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
 
         public MainWindow()
         {
-            InitializeComponent();
-
-            TabsList.ItemsSource = Tabs;
-            Tabs.CollectionChanged += Tabs_CollectionChanged;
+            InitializeComponent();           
 
             (App.Current as App).MainWindows.Add(this);
 
             Task.Run(() => StartProcess("cmd.exe", "Command Prompt"));
-        }
-
-        private void Tabs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            SetTabReferenceSize();
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            SetTabReferenceSize();
-        }
-
-        private void SetTabReferenceSize()
-        {
-            SetTabReferenceSize(Tabs.Count);
-        }
-
-        private void SetTabReferenceSize(int tabsCount)
-        {
-            var da = new DoubleAnimation(Math.Min(201, ((TabsContainer.ColumnDefinitions[0].ActualWidth - NewTab.ActualWidth) / tabsCount) - 1), TimeSpan.FromSeconds(0.2));
-            da.EasingFunction = new ExponentialEase();
-            TabReferenceSize.BeginAnimation(Grid.WidthProperty, da);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -106,9 +76,8 @@ namespace TabbedShell
                     HostedWindowItem = windowItem,
                 };
                 windowItem.TabItem = tabItem;
-                Tabs.Add(tabItem);
 
-                ActivateTab(Tabs.Count - 1);
+                TabsContainer.AddTab(tabItem);
             }));
         }
 
@@ -118,13 +87,6 @@ namespace TabbedShell
             SetWindowOpacity(handle, 0.65);
         }
 
-        private void ActivateTab(int index)
-        {
-            for (int i = 0; i < Tabs.Count; i++)
-                Tabs[i].IsActive = (i == index);
-
-            AttachToWindow(Tabs[index].HostedWindowItem.WindowHandle);
-        }
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
         {
@@ -144,7 +106,7 @@ namespace TabbedShell
             if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
-            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
+            Win32Functions.SetForegroundWindow(TabsContainer.CurrentContainedWindowHandle);
         }
 
         private async void ContainTargetWindow(IntPtr target)
@@ -217,7 +179,7 @@ namespace TabbedShell
             {
                 IntPtr foregroundWindow = Win32Functions.GetForegroundWindow();
 
-                if (foregroundWindow == CurrentContainedWindowHandle)
+                if (foregroundWindow == TabsContainer.CurrentContainedWindowHandle)
                     this.Activate();
             }
         }
@@ -231,80 +193,7 @@ namespace TabbedShell
             if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
                 return;
 
-            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
-        }
-
-        private void NewTab_Click(object sender, RoutedEventArgs e)
-        {
-            if (Properties.Settings.Default.NewTabDefaultIndex == 0)
-                AppContextMenus.NewTabContextMenu.ShowContextMenu(this);
-            else
-                AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1].Action?.Invoke(this);
-        }
-
-        private void Tab_Click(object sender, RoutedEventArgs e)
-        {
-            Debug.WriteLine("Tab");
-            var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
-
-            var index = Tabs.IndexOf(hostedWindowItem.TabItem);
-            ActivateTab(index);
-        }
-
-        private void Tab_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Middle && e.MiddleButton == MouseButtonState.Released)
-            {
-                var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
-                CloseTab(hostedWindowItem);
-            }
-        }
-
-        private void TabClose_Click(object sender, RoutedEventArgs e)
-        {
-            var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
-            CloseTab(hostedWindowItem);
-        }
-
-        private async void CloseTab(HostedWindowItem hostedWindowItem)
-        {
-            await tabCloseSemaphore.WaitAsync();
-
-            try
-            {
-
-                CloseWindowProcess(hostedWindowItem.WindowHandle);
-
-                var index = Tabs.IndexOf(hostedWindowItem.TabItem);
-                var activeIndex = ActiveTabIndex;
-
-                Tabs[index].Exiting = true;
-
-                SetTabReferenceSize(Tabs.Count - 1);
-
-                if (Tabs.Count == 1)
-                {
-                    CloseWindow(sendCloseRequest: true);
-                }
-                else if (activeIndex == index)
-                {
-                    if (index == Tabs.Count - 1)
-                        ActivateTab(Tabs.Count - 2);
-                    else
-                        ActivateTab(index + 1);
-                }
-
-                await Task.Delay(200);
-                Tabs.RemoveAt(index);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Exception in CloseTab: " + ex.ToString());
-            }
-            finally
-            {
-                tabCloseSemaphore.Release();
-            }
+            Win32Functions.SetForegroundWindow(TabsContainer.CurrentContainedWindowHandle);
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
@@ -319,7 +208,7 @@ namespace TabbedShell
 
         private void CloseWindow(bool sendCloseRequest)
         {
-            foreach (var tab in Tabs)
+            foreach (var tab in TabsContainer.Tabs)
             {
                 CloseWindowProcess(tab.HostedWindowItem.WindowHandle);
             }
@@ -381,47 +270,18 @@ namespace TabbedShell
                 Application.Current.Shutdown();
         }
 
-        private void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void TabsContainer_TabActivated(object sender, Controls.TabActivatedEventArgs e)
         {
-            if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed)
-            {
-                ListBoxItem draggedItem = sender as ListBoxItem;
-                (draggedItem.Content as Model.UI.TabItem).Exiting = true;
-
-                // This function is blocking. The rest of the code run after drop event
-                DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
-
-                // TODO: When dropped outside, tab disappears. (Exiting remains true)
-            }
+            AttachToWindow(e.WindowHandle);
         }
 
-        private void TabsList_Drop(object sender, DragEventArgs e)
+        private void TabsContainer_TabClosing(object sender, Controls.TabCloseEventArgs e)
         {
-            Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
-            Model.UI.TabItem target = ((ListBoxItem)(sender)).DataContext as Model.UI.TabItem;
-
-            var addNext = (e.GetPosition((ListBoxItem)sender).X > ((ListBoxItem)sender).ActualWidth / 2);
-
-            droppedData.Exiting = false;
-
-            int removedIdx = Tabs.IndexOf(droppedData);
-            int targetIdx = Tabs.IndexOf(target);
-
-            if (addNext)
+            CloseWindowProcess(e.WindowHandle);
+            if (e.RemainingTabs == 0)
             {
-                Tabs.Insert(targetIdx + 1, droppedData);
-                Tabs.RemoveAt(removedIdx);
+                CloseWindow(sendCloseRequest: true);
             }
-            else
-            {
-                int remIdx = removedIdx + 1;
-                if (Tabs.Count + 1 > remIdx)
-                {
-                    Tabs.Insert(targetIdx, droppedData);
-                    Tabs.RemoveAt(remIdx);
-                }
-            }
-
         }
     }
 }

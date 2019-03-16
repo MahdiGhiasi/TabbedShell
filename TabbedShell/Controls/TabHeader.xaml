@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="TabbedShell.Controls.TabHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TabbedShell.Controls"
+             mc:Ignorable="d" 
+             Background="Transparent"
+             SizeChanged="UserControl_SizeChanged"
+             d:DesignHeight="30" d:DesignWidth="500">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ControlTemplate x:Key="TabListBoxItemTemplate" TargetType="{x:Type ListBoxItem}">
+                <Border x:Name="Bd" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Padding="0">
+                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                </Border>
+            </ControlTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid x:Name="TabReferenceSize" Visibility="Hidden" Width="201" Grid.Column="0" />
+        <StackPanel Orientation="Horizontal" Grid.Column="0">
+            <ListBox x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"></StackPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Template" Value="{StaticResource TabListBoxItemTemplate}" />
+                        <Setter Property="AllowDrop" Value="true"/>
+                        <EventSetter Event="PreviewMouseMove" Handler="TabsList_PreviewMouseMove"/>
+                        <EventSetter Event="Drop" Handler="TabsList_Drop"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DataTemplate.Resources>
+                            <ResourceDictionary>
+                                <Storyboard x:Key="TabEnterStoryboard">
+                                    <DoubleAnimation Storyboard.TargetName="TabGrid"
+                                                     Storyboard.TargetProperty="MaxWidth"
+                                                     Duration="0:0:0.25" From="0" To="200">
+                                        <DoubleAnimation.EasingFunction>
+                                            <ExponentialEase EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                                <Storyboard x:Key="TabExitStoryboard">
+                                    <DoubleAnimation Storyboard.TargetName="TabGrid"
+                                                     Storyboard.TargetProperty="Width"
+                                                     Duration="0:0:0.15" To="0">
+                                        <DoubleAnimation.EasingFunction>
+                                            <ExponentialEase EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </ResourceDictionary>
+                        </DataTemplate.Resources>
+                        <DataTemplate.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource TabEnterStoryboard}" />
+                            </EventTrigger>
+                            <DataTrigger Binding="{Binding Exiting, Mode=OneWay}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard Storyboard="{StaticResource TabExitStoryboard}" />
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                        <StackPanel Orientation="Horizontal" Height="30" Margin="0,0,0,0">
+                            <Grid x:Name="TabGrid" 
+                                  Background="{Binding TabBackColor, Mode=OneWay}" 
+                                  Width="{Binding ActualWidth, ElementName=TabReferenceSize, Mode=OneWay}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="30" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" 
+                                        Style="{StaticResource TabTitleButton}"
+                                        IsManipulationEnabled="True"
+                                        Click="Tab_Click"
+                                        MouseUp="Tab_MouseUp"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        Tag="{Binding HostedWindowItem, Mode=OneWay}">
+                                    <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                               Margin="8,0,0,0"
+                                               TextAlignment="Left"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Center" />
+                                </Button>
+                                <Grid Grid.Column="1">
+                                    <Button Style="{StaticResource TabCloseButton}"
+                                            Tag="{Binding HostedWindowItem, Mode=OneWay}"
+                                            Click="TabClose_Click">
+                                        <TextBlock Text="&#xE947;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   TextAlignment="Center" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid Width="1" Background="#aa999999" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Style="{StaticResource ThemedButton}" x:Name="NewTab" Width="30" Click="NewTab_Click">
+                <TextBlock Text="&#xE948;"
+                           FontFamily="Segoe MDL2 Assets"
+                           TextAlignment="Center" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
