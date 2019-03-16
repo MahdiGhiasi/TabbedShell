@@ -31,12 +31,15 @@ namespace TabbedShell.Controls
         public int ActiveTabIndex => tabs.IndexOf(tabs.FirstOrDefault(x => x.IsActive));
         public IntPtr CurrentContainedWindowHandle => ActiveTabIndex == -1 ? IntPtr.Zero : tabs[ActiveTabIndex].HostedWindowItem.WindowHandle;
 
-        private ObservableCollection<Model.UI.TabItem> tabs { get; } = new ObservableCollection<Model.UI.TabItem>();
-        SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
-
         public event EventHandler<TabActivatedEventArgs> TabActivated;
         public event EventHandler<TabCloseEventArgs> TabClosing;
         public event EventHandler<TabCloseEventArgs> TabClosed;
+
+        private ObservableCollection<Model.UI.TabItem> tabs { get; } = new ObservableCollection<Model.UI.TabItem>();
+        SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
+        Point? tabMouseDownPosition = null;
+
+        private readonly double _minLengthForDrag = 10;
 
         public TabHeader()
         {
@@ -173,22 +176,37 @@ namespace TabbedShell.Controls
             }
         }
 
+        private void TabsList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            tabMouseDownPosition = e.GetPosition(FindMyWindow());
+        }
+
+        private void TabsList_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            tabMouseDownPosition = null;
+        }
+
         private void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed)
             {
-                ListBoxItem draggedItem = sender as ListBoxItem;
-                (draggedItem.Content as Model.UI.TabItem).Exiting = true;
+                if (tabMouseDownPosition.HasValue && Point.Subtract(e.GetPosition(FindMyWindow()), tabMouseDownPosition.Value).Length > _minLengthForDrag)
+                {
+                    ListBoxItem draggedItem = sender as ListBoxItem;
+                    (draggedItem.Content as Model.UI.TabItem).Exiting = true;
 
-                // This function is blocking. The rest of the code run after drop event
-                DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+                    // This function is blocking. The rest of the code run after drop event
+                    DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
 
-                // TODO: When dropped outside, tab disappears. (Exiting remains true)
+                    // TODO: When dropped outside, tab disappears. (Exiting remains true)
+                }
             }
         }
 
         private void TabsList_Drop(object sender, DragEventArgs e)
         {
+            e.Handled = true;
+
             Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
             Model.UI.TabItem target = ((ListBoxItem)(sender)).DataContext as Model.UI.TabItem;
 
@@ -213,9 +231,22 @@ namespace TabbedShell.Controls
                     tabs.RemoveAt(remIdx);
                 }
             }
-
         }
 
+        private void UserControl_Drop(object sender, DragEventArgs e)
+        {
+            Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
+
+            if (droppedData == null)
+                return;
+
+            droppedData.Exiting = false;
+
+            int removedIdx = tabs.IndexOf(droppedData);
+
+            tabs.Add(droppedData);
+            tabs.RemoveAt(removedIdx);
+        }
     }
 
     public class TabCloseEventArgs

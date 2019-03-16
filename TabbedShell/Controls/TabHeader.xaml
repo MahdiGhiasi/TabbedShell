@@ -7,6 +7,8 @@
              mc:Ignorable="d" 
              Background="Transparent"
              SizeChanged="UserControl_SizeChanged"
+             AllowDrop="True"
+             Drop="UserControl_Drop"
              d:DesignHeight="30" d:DesignWidth="500">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -32,6 +34,8 @@
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="Template" Value="{StaticResource TabListBoxItemTemplate}" />
                         <Setter Property="AllowDrop" Value="true"/>
+                        <EventSetter Event="MouseUp" Handler="TabsList_MouseUp"/>
+                        <EventSetter Event="PreviewMouseDown" Handler="TabsList_PreviewMouseDown"/>
                         <EventSetter Event="PreviewMouseMove" Handler="TabsList_PreviewMouseMove"/>
                         <EventSetter Event="Drop" Handler="TabsList_Drop"/>
                     </Style>
