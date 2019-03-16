@@ -15,7 +15,7 @@ namespace TabbedShell.Helpers
                 case "cmd.exe":
                     return "Command Prompt";
                 case "powershell.exe":
-                    return "PowerShell";
+                    return "Windows PowerShell";
                 case "bash.exe":
                     return "Bash";
                 default:

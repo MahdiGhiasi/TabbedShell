@@ -15,7 +15,7 @@
         Closing="Window_Closing"
         Closed="Window_Closed"
         Background="#55000000"
-        Title="MainWindow" 
+        Title="TabbedShell" 
         WindowStyle="None"
         Height="450" 
         Width="800">

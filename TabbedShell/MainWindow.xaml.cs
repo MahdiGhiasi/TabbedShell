@@ -18,6 +18,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using TabbedShell.Classes;
 using TabbedShell.ContextMenus;
 using TabbedShell.Controls;
@@ -37,12 +38,10 @@ namespace TabbedShell
 
         bool switchToContentEnabled = true;
 
-        static int counter;
         public MainWindow()
         {
             InitializeComponent();
-            counter++;
-            this.Title = counter.ToString();
+
             (App.Current as App).MainWindows.Add(this);
 
             Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, (Action)(() =>
@@ -57,8 +56,7 @@ namespace TabbedShell
         public MainWindow(IntPtr windowHandle, string title)
         {
             InitializeComponent();
-            counter++;
-            this.Title = counter.ToString();
+
             (App.Current as App).MainWindows.Add(this);
 
             CreateTabForWindow(windowHandle, title);
@@ -92,14 +90,15 @@ namespace TabbedShell
                 var windowItem = new HostedWindowItem
                 {
                     WindowHandle = handle,
-                    Title = title,
                 };
                 var tabItem = new Model.UI.TabItem
                 {
                     IsActive = true,
+                    Title = title,
                     HostedWindowItem = windowItem,
                 };
                 windowItem.TabItem = tabItem;
+                this.Title = title;
 
                 TabsContainer.AddTab(tabItem);
 

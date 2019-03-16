@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using TabbedShell.Classes;
+using TabbedShell.Win32.Interop;
 
 namespace TabbedShell
 {
@@ -17,6 +19,8 @@ namespace TabbedShell
     {
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
         public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
+
+        private DispatcherTimer windowTitleCheckTimer;
 
         // Single instance and notifying the previous instance obtained from https://stackoverflow.com/a/23730146/942659
 
@@ -57,6 +61,10 @@ namespace TabbedShell
                 thread.IsBackground = true;
 
                 thread.Start();
+
+
+                InitWindowTitleCheckTimer();
+
                 return;
             }
 
@@ -65,6 +73,31 @@ namespace TabbedShell
 
             // Terminate this instance.
             this.Shutdown();
+        }
+
+        private void InitWindowTitleCheckTimer()
+        {
+            windowTitleCheckTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1),
+            };
+            windowTitleCheckTimer.Tick += WindowTitleCheckTimer_Tick;
+            windowTitleCheckTimer.Start();
+        }
+
+        private void WindowTitleCheckTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var window in MainWindows)
+            {
+                foreach (var tab in window.TabsContainer.Tabs)
+                {
+                    try
+                    {
+                        tab.Title = Win32Functions.GetWindowText(tab.HostedWindowItem.WindowHandle);
+                    }
+                    catch { }
+                }
+            }
         }
     }
 }

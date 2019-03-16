@@ -13,7 +13,24 @@ namespace TabbedShell.Model.UI
     public class TabItem : ModelBase
     {
         public HostedWindowItem HostedWindowItem { get; set; }
-        public string Title => HostedWindowItem.Title;
+
+        private string title;
+        public string Title
+        {
+            get
+            {
+                return title;
+            }
+            set
+            {
+                if (title == value)
+                    return;
+
+                title = value;
+                NotifyPropertyChanged(nameof(Title));
+                ContainingTabHeader?.TabTitleUpdated(this);
+            }
+        }
 
         private bool exiting = false;
         public bool Exiting

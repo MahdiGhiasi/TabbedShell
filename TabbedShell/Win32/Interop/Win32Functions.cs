@@ -70,6 +70,19 @@ namespace TabbedShell.Win32.Interop
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern uint GetConsoleProcessList(uint[] ProcessList, uint ProcessCount);
 
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern int GetWindowTextLength(IntPtr hWnd);
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        public static string GetWindowText(IntPtr hWnd)
+        {
+            // Allocate correct string length first
+            int length = GetWindowTextLength(hWnd);
+            StringBuilder sb = new StringBuilder(length + 1);
+            GetWindowText(hWnd, sb, sb.Capacity);
+            return sb.ToString();
+        }
 
         [DllImport("User32.dll")]
         public static extern Int64 SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);

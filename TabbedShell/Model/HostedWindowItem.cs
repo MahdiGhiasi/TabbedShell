@@ -10,8 +10,6 @@ namespace TabbedShell.Model
     public class HostedWindowItem
     {
         public IntPtr WindowHandle { get; set; }
-        public string Title { get; set; }
         public TabItem TabItem { get; set; }
-
     }
 }

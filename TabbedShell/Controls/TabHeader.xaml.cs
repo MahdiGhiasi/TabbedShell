@@ -112,6 +112,14 @@ namespace TabbedShell.Controls
             ActivateTab(tabs.Count - 1);
         }
 
+        public void TabTitleUpdated(Model.UI.TabItem tabItem)
+        {
+            if (tabItem.IsActive)
+            {
+                FindMyWindow().Title = tabItem.Title;
+            }
+        }
+
         private Window FindMyWindow()
         {
             FrameworkElement control = this;
