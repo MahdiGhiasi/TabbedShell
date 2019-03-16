@@ -19,6 +19,13 @@
         WindowStyle="None"
         Height="450" 
         Width="800">
+    <Window.Resources>
+        <ControlTemplate x:Key="TabListBoxItemTemplate" TargetType="{x:Type ListBoxItem}">
+            <Border x:Name="Bd" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Padding="0">
+                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="5" />
@@ -38,13 +45,23 @@
                 </Grid.ColumnDefinitions>
                 <Grid x:Name="TabReferenceSize" Visibility="Hidden" Width="201" Grid.Column="0" />
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
-                    <ItemsControl x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
-                        <ItemsControl.ItemsPanel>
+                    <ListBox x:Name="TabsList" BorderThickness="0" Padding="-2" Background="Transparent">
+                        <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"></StackPanel>
                             </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Template" Value="{StaticResource TabListBoxItemTemplate}" />
+                                <Setter Property="AllowDrop" Value="true"/>
+                                <EventSetter Event="PreviewMouseMove" Handler="TabsList_PreviewMouseMove"/>
+                                <EventSetter Event="Drop" Handler="TabsList_Drop"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <DataTemplate.Resources>
                                     <ResourceDictionary>
@@ -113,8 +130,8 @@
                                     <Grid Width="1" Background="#aa999999" />
                                 </StackPanel>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                     <Button Style="{StaticResource ThemedButton}" x:Name="NewTab" Width="30" Click="NewTab_Click">
                         <TextBlock Text="&#xE948;"
                                    FontFamily="Segoe MDL2 Assets"

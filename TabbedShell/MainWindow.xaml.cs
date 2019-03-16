@@ -380,5 +380,47 @@ namespace TabbedShell
             if ((App.Current as App).MainWindows.Count == 0)
                 Application.Current.Shutdown();
         }
+
+        private void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed)
+            {
+                ListBoxItem draggedItem = sender as ListBoxItem;
+                (draggedItem.Content as Model.UI.TabItem).Exiting = true;
+                DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+                draggedItem.IsSelected = true;
+
+                // TODO: When dropped outside, tab disappears. (Exiting remains true)
+            }
+        }
+
+        private void TabsList_Drop(object sender, DragEventArgs e)
+        {
+            Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
+            Model.UI.TabItem target = ((ListBoxItem)(sender)).DataContext as Model.UI.TabItem;
+
+            var addNext = (e.GetPosition((ListBoxItem)sender).X > ((ListBoxItem)sender).ActualWidth / 2);
+
+            droppedData.Exiting = false;
+
+            int removedIdx = Tabs.IndexOf(droppedData);
+            int targetIdx = Tabs.IndexOf(target);
+
+            if (addNext)
+            {
+                Tabs.Insert(targetIdx + 1, droppedData);
+                Tabs.RemoveAt(removedIdx);
+            }
+            else
+            {
+                int remIdx = removedIdx + 1;
+                if (Tabs.Count + 1 > remIdx)
+                {
+                    Tabs.Insert(targetIdx, droppedData);
+                    Tabs.RemoveAt(remIdx);
+                }
+            }
+
+        }
     }
 }
