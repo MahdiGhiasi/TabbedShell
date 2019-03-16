@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using TabbedShell.Classes;
+using TabbedShell.Helpers;
 using TabbedShell.Win32.Interop;
 
 namespace TabbedShell
@@ -98,7 +99,7 @@ namespace TabbedShell
                 {
                     try
                     {
-                        tab.Title = Win32Functions.GetWindowText(tab.HostedWindowItem.WindowHandle);
+                        tab.Title = DefaultWindowNames.NormalizeTitle(Win32Functions.GetWindowText(tab.HostedWindowItem.WindowHandle));
                     }
                     catch { }
                 }

@@ -22,5 +22,16 @@ namespace TabbedShell.Helpers
                     return "Terminal";
             }
         }
+
+        public static string NormalizeTitle(string title)
+        {
+            switch (title.ToLower())
+            {
+                case @"c:\windows\system32\cmd.exe":
+                    return "Command Prompt";
+                default:
+                    return title;
+            }
+        }
     }
 }
