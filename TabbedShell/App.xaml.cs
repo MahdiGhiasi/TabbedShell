@@ -75,6 +75,11 @@ namespace TabbedShell
             this.Shutdown();
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            mutex.ReleaseMutex();
+        }
+
         private void InitWindowTitleCheckTimer()
         {
             windowTitleCheckTimer = new DispatcherTimer
