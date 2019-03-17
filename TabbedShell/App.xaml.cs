@@ -159,7 +159,7 @@ namespace TabbedShell
                     placement.Length = Marshal.SizeOf(placement);
                     Win32Functions.GetWindowPlacement(hwnd, ref placement);
 
-                    await Task.Delay(10);
+                    await Task.Delay(100);
                     // Ignore if the new process is ours
                     if (TargetProcessIds.Contains((int)consoleProcessId))
                         return;

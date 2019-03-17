@@ -163,7 +163,12 @@ namespace TabbedShell
                 host = new MyHost(target);
                 (App.Current as App).TargetWindowHosts[target] = host;
             }
-
+            
+            if (host.Parent != null)
+            {
+                MessageBox.Show("ContainTargetWindow failed. The host has another parent.");
+                return;
+            }
             WindowContainer.Child = host;
 
             await Task.Delay(10);
