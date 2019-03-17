@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp rescap desktop">
-  <Identity Name="252005c8-0293-4a2a-b128-a5d448edd0bb" Publisher="CN=Mahdi" Version="0.2.1.0" />
+  <Identity Name="252005c8-0293-4a2a-b128-a5d448edd0bb" Publisher="CN=Mahdi" Version="0.2.2.0" />
   <Properties>
     <DisplayName>TabbedShellPackaging</DisplayName>
     <PublisherDisplayName>Mahdi</PublisherDisplayName>
