@@ -304,7 +304,8 @@ namespace TabbedShell
         {
             (App.Current as App).MainWindows.Remove(this);
 
-            if ((App.Current as App).MainWindows.Count == 0)
+            if ((App.Current as App).MainWindows.Count == 0
+                && !Properties.Settings.Default.AttachToAllTerminalsEnabled)
             {
                 TabHeader.DisposeFloatingDragDropThread();
                 Application.Current.Shutdown();
