@@ -14,13 +14,13 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
-      <uap:VisualElements DisplayName="TabbedShellPackaging" Description="TabbedShellPackaging" BackgroundColor="transparent" Square150x150Logo="Images\Square150x150Logo.png" Square44x44Logo="Images\Square44x44Logo.png">
+    <Application Id="App" Executable="TabbedShell\TabbedShell.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements DisplayName="TabbedShell" Description="TabbedShellPackaging" BackgroundColor="transparent" Square150x150Logo="Images\Square150x150Logo.png" Square44x44Logo="Images\Square44x44Logo.png">
         <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png">
         </uap:DefaultTile>
       </uap:VisualElements>
       <Extensions>
-        <desktop:Extension Category="windows.startupTask" Executable="TabbedShellStartupTask.exe" EntryPoint="Windows.FullTrustApplication">
+        <desktop:Extension Category="windows.startupTask" Executable="TabbedShell\TabbedShellStartupTask.exe" EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="TabbedShellStartupTask" Enabled="true" DisplayName="TabbedShell" />
         </desktop:Extension>
       </Extensions>

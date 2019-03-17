@@ -71,11 +71,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TabbedShell\TabbedShell.csproj">
-      <Project>{722c2ec1-4eb8-4e61-b211-74aedd97bd67}</Project>
-      <Name>TabbedShell</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

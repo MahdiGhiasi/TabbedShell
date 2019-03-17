@@ -180,5 +180,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TabbedShellStartupTask\TabbedShellStartupTask.csproj">
+      <Project>{5c1a2bb0-6c2f-4f3a-aed8-2d94454f0275}</Project>
+      <Name>TabbedShellStartupTask</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
