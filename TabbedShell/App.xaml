@@ -1,7 +1,8 @@
 ﻿<Application x:Class="TabbedShell.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TabbedShell">
+             xmlns:local="clr-namespace:TabbedShell"
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <Style x:Key="ThemedButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
