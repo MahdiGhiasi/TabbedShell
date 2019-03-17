@@ -29,49 +29,25 @@ namespace TabbedShell
 
         private DispatcherTimer windowTitleCheckTimer;
 
-
         private Win32Functions.WinEventDelegate windowForegroundHookCallback;
         private Win32Functions.WinEventDelegate windowCreateDestroyHookCallback;
 
         // Single instance and notifying the previous instance obtained from https://stackoverflow.com/a/23730146/942659
 
-        private const string UniqueEventName = "428efeec-180d-4406-aa45-d04c71c250fc";
-        private const string UniqueMutexName = "9fddf5c9-a5b8-491a-929a-537ca81ed578";
-        private EventWaitHandle eventWaitHandle;
-        private Mutex mutex;
+        private static readonly string UniqueEventName = "428efeec-180d-4406-aa45-d04c71c250fc";
+        private static readonly string UniqueMutexName = "9fddf5c9-a5b8-491a-929a-537ca81ed578";
+        private static EventWaitHandle eventWaitHandle;
+        private static Mutex mutex;
 
         /// <summary>The app on startup.</summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The e.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            this.mutex = new Mutex(false, UniqueMutexName);
-            this.eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, UniqueEventName);
-
-            // So, R# would not give a warning that this variable is not used.
-            GC.KeepAlive(this.mutex);
-
-            try
-            {
-                if (!mutex.WaitOne(TimeSpan.FromSeconds(1), false))
-                {
-                    // Notify other instance so it could bring itself to foreground.
-                    this.eventWaitHandle.Set();
-
-                    // Terminate this instance.
-                    this.Shutdown();
-                }
-            }
-            catch (AbandonedMutexException ex)
-            {
-                Debug.WriteLine(ex.ToString());
-            }
-
-
             // Spawn a thread which will be waiting for our event
             var thread = new Thread(() =>
             {
-                while (this.eventWaitHandle.WaitOne())
+                while (eventWaitHandle.WaitOne())
                 {
                     Current.Dispatcher.BeginInvoke(
                         (Action)(() =>
@@ -227,6 +203,35 @@ namespace TabbedShell
                     catch { }
                 }
             }
+        }
+
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            mutex = new Mutex(false, UniqueMutexName);
+            eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, UniqueEventName);
+
+            // So, R# would not give a warning that this variable is not used.
+            GC.KeepAlive(mutex);
+
+            try
+            {
+                if (!mutex.WaitOne(TimeSpan.FromSeconds(1), false))
+                {
+                    // Notify other instance so it could bring itself to foreground.
+                    eventWaitHandle.Set();
+
+                    return;
+                }
+            }
+            catch (AbandonedMutexException ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            var app = new App();
+            app.InitializeComponent();
+            app.Run();
         }
     }
 }
