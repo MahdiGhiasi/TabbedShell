@@ -61,6 +61,8 @@ namespace TabbedShell.ContextMenus
         {
             HideContextMenuAnimation();
             await Task.Delay(150);
+            Left = 100000;
+            await Task.Delay(50);
             this.Hide();
         }
 
@@ -84,11 +86,11 @@ namespace TabbedShell.ContextMenus
             this.Opacity = 0;
             this.Show();
             SetWindowSize();
-            SetWindowPosition();
             ShowContextMenuAnimation();
 
             await Task.Delay(50);
 
+            SetWindowPosition();
             this.Opacity = 1;
         }
 

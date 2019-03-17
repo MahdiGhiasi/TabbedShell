@@ -21,7 +21,7 @@
             <Storyboard x:Key="MenuOpenStoryboard">
                 <DoubleAnimation Storyboard.TargetName="MainBorder" 
                                  Storyboard.TargetProperty="Height"
-                                 Duration="0:0:0.2" From="0" To="100">
+                                 Duration="0:0:0.3" From="0" To="100">
                     <DoubleAnimation.EasingFunction>
                         <ExponentialEase EasingMode="EaseOut" />
                     </DoubleAnimation.EasingFunction>
@@ -30,7 +30,7 @@
             <Storyboard x:Key="MenuCloseStoryboard" FillBehavior="Stop">
                 <DoubleAnimation Storyboard.TargetName="MainBorder" 
                                  Storyboard.TargetProperty="Height"
-                                 Duration="0:0:0.1" From="100" To="0">
+                                 Duration="0:0:0.2" From="100" To="0">
                     <DoubleAnimation.EasingFunction>
                         <ExponentialEase EasingMode="EaseOut" />
                     </DoubleAnimation.EasingFunction>
