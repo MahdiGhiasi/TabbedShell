@@ -236,9 +236,16 @@ namespace TabbedShell
                 Debug.WriteLine(ex.ToString());
             }
 
-            var app = new App();
-            app.InitializeComponent();
-            app.Run();
+            try
+            {
+                var app = new App();
+                app.InitializeComponent();
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
