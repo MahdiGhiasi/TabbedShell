@@ -55,6 +55,7 @@ namespace TabbedShell.ContextMenus
         private void SetWindowSize()
         {
             this.Height = ItemSizeReference.ActualHeight * Items.Count + 16 + 2;
+            MainGrid.Height = this.Height - 2;
         }
 
         private async void Window_Deactivated(object sender, EventArgs e)
