@@ -42,7 +42,6 @@
                            FontSize="14"
                            TextWrapping="Wrap" />
                 <mah:ToggleSwitch x:Name="attachToAllWindowsToggle"
-                                  IsEnabled="False"
                                   Margin="0,8,0,12"
                                   IsChecked="{Binding AttachToAllTerminalsEnabled}"
                                   OffLabel="   Off"

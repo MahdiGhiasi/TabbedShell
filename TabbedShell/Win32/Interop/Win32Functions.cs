@@ -89,6 +89,25 @@ namespace TabbedShell.Win32.Interop
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags uFlags);
 
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+        public static string GetClassName(IntPtr hWnd)
+        {
+            int nRet;
+            // Pre-allocate 256 characters, since this is the maximum class name length.
+            StringBuilder ClassName = new StringBuilder(256);
+            //Get the window class name
+            nRet = GetClassName(hWnd, ClassName, ClassName.Capacity);
+            if (nRet != 0)
+            {
+                return ClassName.ToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
 
         public const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
         public const uint EVENT_OBJECT_CREATE = 0x8000;
@@ -113,6 +132,7 @@ namespace TabbedShell.Win32.Interop
         public static readonly int WS_CHILD = 0x40000000;
         public static readonly int WS_MAXIMIZEBOX = 0x00010000;
         public static readonly int WS_MINIMIZEBOX = 0x00020000;
+        public static readonly int WS_VISIBLE = 0x10000000;
         public static readonly int WS_CAPTION = 0x00C00000;
         public static readonly int WS_THICKFRAME = 0x00040000;
         public static readonly int WS_EX_TOOLWINDOW = 0x00000080;

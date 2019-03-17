@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,7 @@ using TabbedShell.Classes;
 using TabbedShell.Helpers;
 using TabbedShell.Win32.Enums;
 using TabbedShell.Win32.Interop;
+using TabbedShell.Win32.Structs;
 
 namespace TabbedShell
 {
@@ -121,10 +123,62 @@ namespace TabbedShell
             }
 
             // Attach to new terminals
-            if (eventType == Win32Functions.EVENT_OBJECT_CREATE && TabbedShell.Properties.Settings.Default.AttachToAllTerminalsEnabled)
+            if (eventType == Win32Functions.EVENT_OBJECT_CREATE
+                && TabbedShell.Properties.Settings.Default.AttachToAllTerminalsEnabled)
             {
-                // TODO
+                var className = Win32Functions.GetClassName(hwnd);
+                if (className == "ConsoleWindowClass")
+                {
+                    Dispatcher.BeginInvoke(DispatcherPriority.Input, (Action)(() =>
+                    {
+                        WaitForPotentialConsoleWindow(hwnd);
+                    }));
+                }
             }
+        }
+
+        private async void WaitForPotentialConsoleWindow(IntPtr hwnd)
+        {
+            var beginTime = DateTime.UtcNow;
+
+            Win32Functions.GetWindowThreadProcessId(hwnd, out uint consoleProcessId);
+            var consoleProcess = Process.GetProcessById((int)consoleProcessId);
+
+            // Ignore 'wslhost'
+            if (consoleProcess.ProcessName == "wslhost")
+                return;
+
+            var consoleParentId = consoleProcess.Parent().Id;
+            var myId = Process.GetCurrentProcess().Id;
+
+            // Ignore if the new process is ours
+            if (consoleParentId == myId)
+                return;
+
+            // Minimize window
+            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+            placement.Length = Marshal.SizeOf(placement);
+            Win32Functions.GetWindowPlacement(hwnd, ref placement);
+            placement.ShowCmd = ShowWindowCommands.Minimize;
+            Win32Functions.SetWindowPlacement(hwnd, ref placement);
+
+            // Wait to see if it becomes visible
+            while (DateTime.UtcNow - beginTime < TimeSpan.FromSeconds(2))
+            {
+                int style = Win32Functions.GetWindowLongPtr(hwnd, Win32Functions.GWL_STYLE).ToInt32();
+                bool isVisible = ((style & Win32Functions.WS_VISIBLE) != 0);
+                if (isVisible)
+                {
+                    Debug.WriteLine("New console window detected! " + hwnd.ToString());
+                    (new MainWindow(hwnd, "")).Show();
+
+                    return;
+                }
+
+                await Task.Delay(10);
+            }
+
+
         }
 
         private void ForegroundWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
