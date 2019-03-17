@@ -190,23 +190,19 @@ namespace TabbedShell.Controls
 
             try
             {
+                var index = tabs.IndexOf(hostedWindowItem.TabItem);
+                if (index == -1)
+                    return;
+
                 TabClosing?.Invoke(this, new TabCloseEventArgs
                 {
                     WindowHandle = hostedWindowItem.WindowHandle,
                     RemainingTabs = tabs.Count - 1,
                 });
-
-                var index = tabs.IndexOf(hostedWindowItem.TabItem);
-
-                if (index == -1)
-                    return;
-
-                var activeIndex = ActiveTabIndex;
-
                 tabs[index].Exiting = true;
-
                 SetTabReferenceSize(tabs.Count - 1);
 
+                var activeIndex = ActiveTabIndex;
                 if (tabs.Count > 1 && activeIndex == index)
                 {
                     if (index == tabs.Count - 1)
