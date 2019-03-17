@@ -268,10 +268,17 @@ namespace TabbedShell.Controls
                     TabDragBegin?.Invoke(this, new EventArgs());
 
                     // Make sure UI updates with new tab activations, before being blocked by DoDragDrop
-                    await Task.Delay(10); 
-                    
-                    // This function is blocking. The rest of the code run after drop event
-                    DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+                    await Task.Delay(10);
+
+                    try
+                    {
+                        // This function is blocking. The rest of the code run after drop event
+                        DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("DoDragDrop failed: " + ex.ToString());
+                    }
 
                     await Task.Delay(100);
                     if (tabItem.Exiting && tabItem.DragAndDropping)
