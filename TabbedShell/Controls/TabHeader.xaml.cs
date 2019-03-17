@@ -197,6 +197,10 @@ namespace TabbedShell.Controls
                 });
 
                 var index = tabs.IndexOf(hostedWindowItem.TabItem);
+
+                if (index == -1)
+                    return;
+
                 var activeIndex = ActiveTabIndex;
 
                 tabs[index].Exiting = true;
