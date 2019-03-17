@@ -25,7 +25,7 @@ namespace TabbedShell.Model.UI
             {
                 if (title == value)
                     return;
-
+                
                 title = value;
                 NotifyPropertyChanged(nameof(Title));
                 ContainingTabHeader?.TabTitleUpdated(this);

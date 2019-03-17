@@ -108,6 +108,7 @@
     <Compile Include="TabFloatingDragDropWindow.xaml.cs">
       <DependentUpon>TabFloatingDragDropWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Win32\Enums\SetWindowPosFlags.cs" />
     <Compile Include="Win32\Enums\ShowWindowCommands.cs" />
     <Compile Include="Win32\Interop\Win32Functions.cs" />
     <Compile Include="Win32\Structs\WINDOWPLACEMENT.cs" />

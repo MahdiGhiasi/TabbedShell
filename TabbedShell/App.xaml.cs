@@ -7,9 +7,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using TabbedShell.Classes;
 using TabbedShell.Helpers;
+using TabbedShell.Win32.Enums;
 using TabbedShell.Win32.Interop;
 
 namespace TabbedShell
@@ -23,6 +25,10 @@ namespace TabbedShell
         public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
 
         private DispatcherTimer windowTitleCheckTimer;
+
+
+        private Win32Functions.WinEventDelegate windowForegroundHookCallback;
+        private Win32Functions.WinEventDelegate windowCreateDestroyHookCallback;
 
         // Single instance and notifying the previous instance obtained from https://stackoverflow.com/a/23730146/942659
 
@@ -76,8 +82,66 @@ namespace TabbedShell
             thread.IsBackground = true;
             thread.Start();
 
-
             InitWindowTitleCheckTimer();
+
+            HookForegroundWindowEvent();
+            HookCreateDestroyWindowEvent();
+        }
+
+        private void HookCreateDestroyWindowEvent()
+        {
+            windowCreateDestroyHookCallback = new Win32Functions.WinEventDelegate(CreateDestroyWinEventProc);
+
+            var hook = Win32Functions.SetWinEventHook(Win32Functions.EVENT_OBJECT_CREATE, Win32Functions.EVENT_OBJECT_DESTROY,
+                IntPtr.Zero, windowCreateDestroyHookCallback,
+                0, 0, Win32Functions.WINEVENT_OUTOFCONTEXT);
+        }
+
+        private void HookForegroundWindowEvent()
+        {
+            windowForegroundHookCallback = new Win32Functions.WinEventDelegate(ForegroundWinEventProc);
+
+            var hook = Win32Functions.SetWinEventHook(Win32Functions.EVENT_SYSTEM_FOREGROUND, Win32Functions.EVENT_SYSTEM_FOREGROUND,
+                IntPtr.Zero, windowForegroundHookCallback,
+                0, 0, Win32Functions.WINEVENT_OUTOFCONTEXT);
+        }
+
+        private void CreateDestroyWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            // Close tab if process exited
+            if (eventType == Win32Functions.EVENT_OBJECT_DESTROY)
+            {
+                var allTabs = (from window in MainWindows
+                               from tab in window.TabsContainer.Tabs
+                               select (window, tab)).ToList();
+
+                foreach (var (window, tab) in allTabs)
+                    if (tab.HostedWindowItem.WindowHandle == hwnd)
+                            window.TabsContainer.CloseTab(tab.HostedWindowItem);
+            }
+
+            // Attach to new terminals
+            if (eventType == Win32Functions.EVENT_OBJECT_CREATE && TabbedShell.Properties.Settings.Default.AttachToAllTerminalsEnabled)
+            {
+                // TODO
+            }
+        }
+
+        private void ForegroundWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            // Makes sure relevant MainWindow comes to front when user clicks on the the terminal window (not on the border or tab bar)
+            var allTabs = (from window in MainWindows
+                           from tab in window.TabsContainer.Tabs
+                           select (window, tab)).ToList();
+
+            foreach (var (window, tab) in allTabs)
+                if (tab.HostedWindowItem.WindowHandle == hwnd)
+                {
+                    // Bring window to front without activating it
+                    // https://stackoverflow.com/a/14211193/942659
+                    Win32Functions.SetWindowPos((new WindowInteropHelper(window)).Handle,
+                        Win32Functions.HWND_TOP, 0, 0, 0, 0, SetWindowPosFlags.IgnoreMove | SetWindowPosFlags.IgnoreResize | SetWindowPosFlags.DoNotActivate);
+                }
         }
 
         private void InitWindowTitleCheckTimer()

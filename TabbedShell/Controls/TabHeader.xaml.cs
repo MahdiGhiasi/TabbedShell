@@ -184,7 +184,7 @@ namespace TabbedShell.Controls
             CloseTab(hostedWindowItem);
         }
 
-        private async void CloseTab(HostedWindowItem hostedWindowItem)
+        public async void CloseTab(HostedWindowItem hostedWindowItem)
         {
             await tabCloseSemaphore.WaitAsync();
 
