@@ -69,21 +69,28 @@ namespace TabbedShell
 
         public async void StartProcess(string procName)
         {
-            var cmd = new ProcessStartInfo(procName)
+            try
             {
-                WindowStyle = ProcessWindowStyle.Minimized,
-                CreateNoWindow = true,
-            };
-            var process = Process.Start(cmd);
+                await (App.Current as App).WindowContainSemaphore.WaitAsync();
 
-            (App.Current as App).TargetProcessIds.Add(process.Id);
+                var cmd = new ProcessStartInfo(procName)
+                {
+                    WindowStyle = ProcessWindowStyle.Minimized,
+                    CreateNoWindow = true,
+                };
+                var process = Process.Start(cmd);
 
-            while (process.MainWindowHandle == IntPtr.Zero)
-            {
-                await Task.Delay(10);
+                while (process.MainWindowHandle == IntPtr.Zero)
+                {
+                    await Task.Delay(10);
+                }
+
+                await CreateTabForWindow(process.MainWindowHandle, DefaultWindowNames.GetName(procName));
             }
-
-            await CreateTabForWindow(process.MainWindowHandle, DefaultWindowNames.GetName(procName));
+            finally
+            {
+                (App.Current as App).WindowContainSemaphore.Release();
+            }
         }
 
         private async Task CreateTabForWindow(IntPtr handle, string title)
@@ -163,7 +170,7 @@ namespace TabbedShell
                 host = new MyHost(target);
                 (App.Current as App).TargetWindowHosts[target] = host;
             }
-            
+
             if (host.Parent != null)
             {
                 MessageBox.Show("ContainTargetWindow failed. The host has another parent.");
@@ -291,8 +298,6 @@ namespace TabbedShell
 
                 try
                 {
-                    (App.Current as App).TargetProcessIds.Remove((int)procId);
-
                     var process = Process.GetProcessById((int)procId);
                     process.Kill();
                 }

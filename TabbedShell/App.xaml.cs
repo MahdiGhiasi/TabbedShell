@@ -25,7 +25,8 @@ namespace TabbedShell
     {
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
         public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
-        public HashSet<int> TargetProcessIds { get; } = new HashSet<int>();
+
+        public SemaphoreSlim WindowContainSemaphore { get; } = new SemaphoreSlim(1, 1);
 
         private DispatcherTimer windowTitleCheckTimer;
 
@@ -135,14 +136,11 @@ namespace TabbedShell
 
             Win32Functions.GetWindowThreadProcessId(hwnd, out uint consoleProcessId);
 
-            // Ignore if the new process is ours
-            if (TargetProcessIds.Contains((int)consoleProcessId))
-                return;
-
             var consoleProcess = Process.GetProcessById((int)consoleProcessId);
 
             // Ignore 'wslhost'
-            if (consoleProcess.ProcessName == "wslhost")
+            var processName = consoleProcess.ProcessName.ToLower();
+            if (processName == "wslhost")
                 return;
 
             // Wait to see if it becomes visible
@@ -162,19 +160,31 @@ namespace TabbedShell
                     placement.Length = Marshal.SizeOf(placement);
                     Win32Functions.GetWindowPlacement(hwnd, ref placement);
 
-                    await Task.Delay(100);
-                    // Ignore if the new process is ours
-                    if (TargetProcessIds.Contains((int)consoleProcessId))
-                        return;
-
-                    var window = new MainWindow(hwnd, title)
+                    try
                     {
-                        Left = placement.NormalPosition.Left,
-                        Top = placement.NormalPosition.Top,
-                        Width = placement.NormalPosition.Width,
-                        Height = placement.NormalPosition.Height,
-                    };
-                    window.Show();
+                        await WindowContainSemaphore.WaitAsync();
+
+                        // Ignore if the new window is ours
+                        var allHandles = from window in MainWindows
+                                         from tab in window.TabsContainer.Tabs
+                                         select tab.HostedWindowItem.WindowHandle;
+                        if (allHandles.Contains(hwnd))
+                            return;
+
+
+                        var mainWindow = new MainWindow(hwnd, title)
+                        {
+                            Left = placement.NormalPosition.Left,
+                            Top = placement.NormalPosition.Top,
+                            Width = placement.NormalPosition.Width,
+                            Height = placement.NormalPosition.Height,
+                        };
+                        mainWindow.Show();
+                    }
+                    finally
+                    {
+                        WindowContainSemaphore.Release();
+                    }
 
                     return;
                 }
