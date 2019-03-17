@@ -154,6 +154,9 @@ namespace TabbedShell
                 {
                     Debug.WriteLine("New console window detected! " + hwnd.ToString());
 
+                    // Get window title
+                    var title = Win32Functions.GetWindowText(hwnd);
+
                     // Get window position
                     WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
                     placement.Length = Marshal.SizeOf(placement);
@@ -164,7 +167,7 @@ namespace TabbedShell
                     if (TargetProcessIds.Contains((int)consoleProcessId))
                         return;
 
-                    var window = new MainWindow(hwnd, "")
+                    var window = new MainWindow(hwnd, title)
                     {
                         Left = placement.NormalPosition.Left,
                         Top = placement.NormalPosition.Top,
