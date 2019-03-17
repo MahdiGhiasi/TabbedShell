@@ -36,17 +36,17 @@ namespace TabbedShell.Win32.Structs
         /// <summary>
         /// The coordinates of the window's upper-left corner when the window is minimized.
         /// </summary>
-        public System.Drawing.Point MinPosition;
+        public POINT MinPosition;
 
         /// <summary>
         /// The coordinates of the window's upper-left corner when the window is maximized.
         /// </summary>
-        public System.Drawing.Point MaxPosition;
+        public POINT MaxPosition;
 
         /// <summary>
         /// The window's coordinates when the window is in the restored position.
         /// </summary>
-        public System.Drawing.Rectangle NormalPosition;
+        public RECT NormalPosition;
 
         /// <summary>
         /// Gets the default (empty) value.
@@ -61,4 +61,6 @@ namespace TabbedShell.Win32.Structs
             }
         }
     }
+
+
 }

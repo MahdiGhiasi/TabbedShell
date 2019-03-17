@@ -137,13 +137,6 @@ namespace TabbedShell
             // Ignore 'wslhost'
             if (consoleProcess.ProcessName == "wslhost")
                 return;
-            
-            // Minimize window
-            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-            placement.Length = Marshal.SizeOf(placement);
-            Win32Functions.GetWindowPlacement(hwnd, ref placement);
-            placement.ShowCmd = ShowWindowCommands.Minimize;
-            Win32Functions.SetWindowPlacement(hwnd, ref placement);
 
             // Wait to see if it becomes visible
             do
@@ -153,7 +146,21 @@ namespace TabbedShell
                 if (isVisible)
                 {
                     Debug.WriteLine("New console window detected! " + hwnd.ToString());
-                    (new MainWindow(hwnd, "")).Show();
+
+                    // Get window position
+                    WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                    placement.Length = Marshal.SizeOf(placement);
+                    Win32Functions.GetWindowPlacement(hwnd, ref placement);
+
+                    var window = new MainWindow(hwnd, "")
+                    {
+                        Left = placement.NormalPosition.Left,
+                        Top = placement.NormalPosition.Top,
+                        Width = placement.NormalPosition.Width,
+                        Height = placement.NormalPosition.Height,
+                    };
+
+                    window.Show();
 
                     return;
                 }
