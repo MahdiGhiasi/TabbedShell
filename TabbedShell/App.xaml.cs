@@ -159,6 +159,11 @@ namespace TabbedShell
                     placement.Length = Marshal.SizeOf(placement);
                     Win32Functions.GetWindowPlacement(hwnd, ref placement);
 
+                    await Task.Delay(10);
+                    // Ignore if the new process is ours
+                    if (TargetProcessIds.Contains((int)consoleProcessId))
+                        return;
+
                     var window = new MainWindow(hwnd, "")
                     {
                         Left = placement.NormalPosition.Left,
@@ -166,7 +171,6 @@ namespace TabbedShell
                         Width = placement.NormalPosition.Width,
                         Height = placement.NormalPosition.Height,
                     };
-
                     window.Show();
 
                     return;
