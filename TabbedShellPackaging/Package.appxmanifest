@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp rescap desktop">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" 
+         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" 
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" 
+         xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5" 
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" 
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" 
+         IgnorableNamespaces="uap uap5 mp rescap desktop">
   <Identity Name="252005c8-0293-4a2a-b128-a5d448edd0bb" Publisher="CN=Mahdi" Version="0.2.2.0" />
   <Properties>
     <DisplayName>TabbedShellPackaging</DisplayName>
@@ -23,6 +29,11 @@
         <desktop:Extension Category="windows.startupTask" Executable="TabbedShell\TabbedShellStartupTask.exe" EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="TabbedShellStartupTask" Enabled="true" DisplayName="TabbedShell" />
         </desktop:Extension>
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="TabbedShell\TabbedShell.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias>
+            <uap5:ExecutionAlias Alias="tabbedshell.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
       </Extensions>
     </Application>
   </Applications>
