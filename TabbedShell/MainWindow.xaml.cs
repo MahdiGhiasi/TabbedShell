@@ -227,12 +227,6 @@ namespace TabbedShell
         {
             switchToContentEnabled = true;
             Debug.WriteLine("MouseLeave");
-
-            await Task.Delay(100);
-            if (AppContextMenus.IsAContextMenuOpen || SettingsWindow.IsOpen)
-                return;
-
-            Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
         private void CloseWindow_Click(object sender, RoutedEventArgs e)
