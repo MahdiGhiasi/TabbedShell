@@ -75,6 +75,9 @@ namespace TabbedShell
                 CreateNoWindow = true,
             };
             var process = Process.Start(cmd);
+
+            (App.Current as App).TargetProcessIds.Add(process.Id);
+
             while (process.MainWindowHandle == IntPtr.Zero)
             {
                 await Task.Delay(10);
@@ -283,6 +286,8 @@ namespace TabbedShell
 
                 try
                 {
+                    (App.Current as App).TargetProcessIds.Remove((int)procId);
+
                     var process = Process.GetProcessById((int)procId);
                     process.Kill();
                 }

@@ -25,6 +25,7 @@ namespace TabbedShell
     {
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
         public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
+        public HashSet<int> TargetProcessIds { get; } = new HashSet<int>();
 
         private DispatcherTimer windowTitleCheckTimer;
 
@@ -84,10 +85,18 @@ namespace TabbedShell
             thread.IsBackground = true;
             thread.Start();
 
+            if (!e.Args.Contains("--startup"))
+                InitMainWindow();
+
             InitWindowTitleCheckTimer();
 
             HookForegroundWindowEvent();
             HookCreateDestroyWindowEvent();
+        }
+
+        private void InitMainWindow()
+        {
+            (new MainWindow()).Show();
         }
 
         private void HookCreateDestroyWindowEvent()
@@ -142,19 +151,17 @@ namespace TabbedShell
             var beginTime = DateTime.UtcNow;
 
             Win32Functions.GetWindowThreadProcessId(hwnd, out uint consoleProcessId);
+
+            // Ignore if the new process is ours
+            if (TargetProcessIds.Contains((int)consoleProcessId))
+                return;
+
             var consoleProcess = Process.GetProcessById((int)consoleProcessId);
 
             // Ignore 'wslhost'
             if (consoleProcess.ProcessName == "wslhost")
                 return;
-
-            var consoleParentId = consoleProcess.Parent().Id;
-            var myId = Process.GetCurrentProcess().Id;
-
-            // Ignore if the new process is ours
-            if (consoleParentId == myId)
-                return;
-
+            
             // Minimize window
             WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
             placement.Length = Marshal.SizeOf(placement);
@@ -163,7 +170,7 @@ namespace TabbedShell
             Win32Functions.SetWindowPlacement(hwnd, ref placement);
 
             // Wait to see if it becomes visible
-            while (DateTime.UtcNow - beginTime < TimeSpan.FromSeconds(2))
+            do
             {
                 int style = Win32Functions.GetWindowLongPtr(hwnd, Win32Functions.GWL_STYLE).ToInt32();
                 bool isVisible = ((style & Win32Functions.WS_VISIBLE) != 0);
@@ -177,8 +184,7 @@ namespace TabbedShell
 
                 await Task.Delay(10);
             }
-
-
+            while (DateTime.UtcNow - beginTime < TimeSpan.FromSeconds(2));
         }
 
         private void ForegroundWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
