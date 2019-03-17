@@ -95,30 +95,37 @@ namespace TabbedShell
 
         private void CreateDestroyWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            // Close tab if process exited
-            if (eventType == Win32Functions.EVENT_OBJECT_DESTROY)
+            try
             {
-                var allTabs = (from window in MainWindows
-                               from tab in window.TabsContainer.Tabs
-                               select (window, tab)).ToList();
-
-                foreach (var (window, tab) in allTabs)
-                    if (tab.HostedWindowItem.WindowHandle == hwnd)
-                            window.TabsContainer.CloseTab(tab.HostedWindowItem);
-            }
-
-            // Attach to new terminals
-            if (eventType == Win32Functions.EVENT_OBJECT_CREATE
-                && TabbedShell.Properties.Settings.Default.AttachToAllTerminalsEnabled)
-            {
-                var className = Win32Functions.GetClassName(hwnd);
-                if (className == "ConsoleWindowClass")
+                // Close tab if process exited
+                if (eventType == Win32Functions.EVENT_OBJECT_DESTROY)
                 {
-                    Dispatcher.BeginInvoke(DispatcherPriority.Input, (Action)(() =>
-                    {
-                        WaitForPotentialConsoleWindow(hwnd);
-                    }));
+                    var allTabs = (from window in MainWindows
+                                   from tab in window.TabsContainer.Tabs
+                                   select (window, tab)).ToList();
+
+                    foreach (var (window, tab) in allTabs)
+                        if (tab.HostedWindowItem.WindowHandle == hwnd)
+                            window.TabsContainer.CloseTab(tab.HostedWindowItem);
                 }
+
+                // Attach to new terminals
+                if (eventType == Win32Functions.EVENT_OBJECT_CREATE
+                    && TabbedShell.Properties.Settings.Default.AttachToAllTerminalsEnabled)
+                {
+                    var className = Win32Functions.GetClassName(hwnd);
+                    if (className == "ConsoleWindowClass")
+                    {
+                        Dispatcher.BeginInvoke(DispatcherPriority.Input, (Action)(() =>
+                        {
+                            WaitForPotentialConsoleWindow(hwnd);
+                        }));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("CreateDestroyWinEventProc: " + ex.ToString());
             }
         }
 
@@ -172,19 +179,26 @@ namespace TabbedShell
 
         private void ForegroundWinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            // Makes sure relevant MainWindow comes to front when user clicks on the the terminal window (not on the border or tab bar)
-            var allTabs = (from window in MainWindows
-                           from tab in window.TabsContainer.Tabs
-                           select (window, tab)).ToList();
+            try
+            {
+                // Makes sure relevant MainWindow comes to front when user clicks on the the terminal window (not on the border or tab bar)
+                var allTabs = (from window in MainWindows
+                               from tab in window.TabsContainer.Tabs
+                               select (window, tab)).ToList();
 
-            foreach (var (window, tab) in allTabs)
-                if (tab.HostedWindowItem.WindowHandle == hwnd)
-                {
-                    // Bring window to front without activating it
-                    // https://stackoverflow.com/a/14211193/942659
-                    Win32Functions.SetWindowPos((new WindowInteropHelper(window)).Handle,
-                        Win32Functions.HWND_TOP, 0, 0, 0, 0, SetWindowPosFlags.IgnoreMove | SetWindowPosFlags.IgnoreResize | SetWindowPosFlags.DoNotActivate);
-                }
+                foreach (var (window, tab) in allTabs)
+                    if (tab.HostedWindowItem.WindowHandle == hwnd)
+                    {
+                        // Bring window to front without activating it
+                        // https://stackoverflow.com/a/14211193/942659
+                        Win32Functions.SetWindowPos((new WindowInteropHelper(window)).Handle,
+                            Win32Functions.HWND_TOP, 0, 0, 0, 0, SetWindowPosFlags.IgnoreMove | SetWindowPosFlags.IgnoreResize | SetWindowPosFlags.DoNotActivate);
+                    }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("CreateDestroyWinEventProc: " + ex.ToString());
+            }
         }
 
         private void InitWindowTitleCheckTimer()
