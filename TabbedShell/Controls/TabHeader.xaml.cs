@@ -296,9 +296,14 @@ namespace TabbedShell.Controls
 
                         // Floating tab should stay there a bit more, so the window have time to initialize.
                         await Task.Delay(500);
+                        tabFloatingDragDropWindow.Stop(fadeOut: true);
+                    }
+                    else
+                    {
+                        tabFloatingDragDropWindow.Stop();
                     }
 
-                    tabFloatingDragDropWindow.Stop();
+                    
                     TabDragEnd?.Invoke(this, new EventArgs());
                 }
             }

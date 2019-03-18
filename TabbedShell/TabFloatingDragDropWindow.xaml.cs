@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -77,14 +78,32 @@ namespace TabbedShell
             catch { }
         }
 
-        public void Stop()
+        public void Stop(bool fadeOut = false)
         {
             try
             {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(async () =>
                 {
                     timer.Stop();
-                    this.Hide();
+                    if (fadeOut)
+                    {
+                        var animationDuration = TimeSpan.FromSeconds(0.2);
+                        var animation = new DoubleAnimation(0, animationDuration)
+                        {
+                            EasingFunction = new ExponentialEase
+                            {
+                                EasingMode = EasingMode.EaseOut,
+                            },
+                            FillBehavior = FillBehavior.Stop,
+                        };
+                        this.BeginAnimation(Window.OpacityProperty, animation);
+                        await Task.Delay(animationDuration.Add(TimeSpan.FromMilliseconds(-10)));
+                        this.Hide();
+                    }
+                    else
+                    {
+                        this.Hide();
+                    }
                 }));
             }
             catch { }
