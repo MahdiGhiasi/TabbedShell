@@ -50,8 +50,8 @@ namespace TabbedShell
             {
                 var point = System.Windows.Forms.Cursor.Position;
 
-                this.Left = point.X - 30;
-                this.Top = point.Y - 32;
+                this.Left = point.X - 4;
+                this.Top = point.Y - 15;
             }));
         }
 
@@ -62,10 +62,13 @@ namespace TabbedShell
                 Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
                 {
                     this.tabItem = tabItem;
-                    this.Background = tabItem.TabActiveBackColor;
-                    this.tabTitle.Text = tabItem.Title;
+                    this.Background = new SolidColorBrush(Colors.Transparent);
+                    this.tabTitle.Content = tabItem.Title;
                     this.Width = width;
                     this.Opacity = 1;
+                    MainBorder.BorderThickness = new Thickness(0.5);
+                    ColoredBorder.BorderThickness = new Thickness(0.5);
+                    ColoredBorder.BorderBrush = tabItem.TabActiveBackColor;
 
                     timer.Start();
                     this.Show();
@@ -109,7 +112,7 @@ namespace TabbedShell
                 await Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
                 {
                     timer.Stop();
-                    tcs.TrySetResult(new Point(this.Left, this.Top)); 
+                    tcs.TrySetResult(new Point(this.Left, this.Top));
                 }));
 
                 return await tcs.Task;
@@ -117,6 +120,20 @@ namespace TabbedShell
             catch { }
 
             return new Point(0, 0);
+        }
+
+        public void SetBackgroundColor()
+        {
+            try
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
+                {
+                    this.Background = tabItem.TabActiveBackColor;
+                    ColoredBorder.BorderThickness = new Thickness(0);
+                    MainBorder.BorderThickness = new Thickness(0);
+                }));
+            }
+            catch { }
         }
     }
 }

@@ -15,17 +15,50 @@
         <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="0" />
     </WindowChrome.WindowChrome>
-    <Grid>
-        <Button Grid.Column="0" 
-                Style="{StaticResource TabTitleButton}"
-                HorizontalAlignment="Stretch"
-                HorizontalContentAlignment="Stretch">
-            <TextBlock x:Name="tabTitle"
-                       Text=""
-                       Margin="8,0,0,0"
-                       TextAlignment="Left"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Center" />
-        </Button>
-    </Grid>
+    <Window.Resources>
+        <Style x:Key="OutlinedTextBlock" TargetType="ContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContentControl}">
+                        <ControlTemplate.Resources>
+                            <Style x:Key="BorderTextBlock" TargetType="TextBlock">
+                                <Setter Property="Text" Value="{Binding Text, ElementName=MainTextBlock}" />
+                            </Style>
+                        </ControlTemplate.Resources>
+                        <Grid>
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="-1,0,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="0,-1,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="1,0,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="0,1,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="-1,-1,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="-1,1,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="1,-1,0,0" />
+                            <TextBlock Foreground="{TemplateBinding BorderBrush}" Style="{StaticResource BorderTextBlock}" Margin="1,1,0,0" />
+
+                            <TextBlock x:Name="MainTextBlock" 
+                                       Foreground="{TemplateBinding Foreground}"
+                                       Text="{TemplateBinding Content}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Border x:Name="MainBorder" BorderBrush="White" BorderThickness="0.5">
+        <Border x:Name="ColoredBorder" BorderBrush="White" BorderThickness="0.5">
+            <Button Grid.Column="0" 
+                    Margin="-0.5,0.5,0,0"
+                    Style="{StaticResource TabTitleButton}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch">
+                <Grid Margin="8,0,0,0">
+                    <ContentControl x:Name="tabTitle"
+                                    Style="{StaticResource OutlinedTextBlock}"
+                                    BorderBrush="#99000000"
+                                    Foreground="White"
+                                    Content="Hey Yooooo" />
+                </Grid>
+            </Button>
+        </Border>
+    </Border>
 </Window>

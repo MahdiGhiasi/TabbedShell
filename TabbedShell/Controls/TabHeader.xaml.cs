@@ -284,6 +284,7 @@ namespace TabbedShell.Controls
                     if (tabItem.Exiting && tabItem.DragAndDropping)
                     {
                         // Dropped outside
+                        tabFloatingDragDropWindow.SetBackgroundColor();
                         tabItem.DragAndDropping = false;
                         tabs.Remove(tabItem);
                         var position = await tabFloatingDragDropWindow.StopMovement();
