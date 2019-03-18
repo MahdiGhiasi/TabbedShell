@@ -13,6 +13,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using TabbedShell.Helpers;
 using TabbedShell.Model.UI;
 
 namespace TabbedShell
@@ -49,7 +50,7 @@ namespace TabbedShell
 
             Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
             {
-                var point = System.Windows.Forms.Cursor.Position;
+                var point = CursorHelper.GetCursorPosition();
 
                 this.Left = point.X - 4;
                 this.Top = point.Y - 15;

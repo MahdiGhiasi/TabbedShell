@@ -171,13 +171,13 @@ namespace TabbedShell
                         if (allHandles.Contains(hwnd))
                             return;
 
-
+                        System.Windows.Forms.Screen.PrimaryScreen.GetScaleFactors(out double scaleX, out double scaleY);
                         var mainWindow = new MainWindow(hwnd, title)
                         {
-                            Left = placement.NormalPosition.Left,
-                            Top = placement.NormalPosition.Top,
-                            Width = placement.NormalPosition.Width,
-                            Height = placement.NormalPosition.Height,
+                            Left = placement.NormalPosition.Left / scaleX,
+                            Top = placement.NormalPosition.Top / scaleY,
+                            Width = placement.NormalPosition.Width / scaleX,
+                            Height = placement.NormalPosition.Height / scaleY,
                         };
                         mainWindow.Show();
                     }

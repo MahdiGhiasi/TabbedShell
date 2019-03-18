@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TabbedShell.Helpers;
 using TabbedShell.Model.ContextMenu;
 
 namespace TabbedShell.ContextMenus
@@ -109,7 +110,7 @@ namespace TabbedShell.ContextMenus
 
         private void SetWindowPosition()
         {
-            var point = this.PointToScreen(Mouse.GetPosition(this));
+            var point = CursorHelper.GetCursorPosition();
 
             this.Left = point.X - this.Width / 2;
             this.Top = point.Y;
