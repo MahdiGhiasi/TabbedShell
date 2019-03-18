@@ -46,6 +46,7 @@ namespace TabbedShell.Controls
         static Thread tabFloatingDragDropThread = null;
 
         private readonly double _minLengthForDrag = 10;
+        private readonly double _tabMaxWidth = 201;
 
         public TabHeader()
         {
@@ -143,7 +144,7 @@ namespace TabbedShell.Controls
 
         private void SetTabReferenceSize(int tabsCount)
         {
-            var da = new DoubleAnimation(Math.Min(201, ((this.ActualWidth - NewTab.ActualWidth) / tabsCount) - 1), TimeSpan.FromSeconds(0.2));
+            var da = new DoubleAnimation(Math.Min(_tabMaxWidth, ((this.ActualWidth - NewTab.ActualWidth) / tabsCount) - 1), TimeSpan.FromSeconds(0.2));
             da.EasingFunction = new ExponentialEase();
             TabReferenceSize.BeginAnimation(Grid.WidthProperty, da);
         }
@@ -263,7 +264,7 @@ namespace TabbedShell.Controls
                             ActivateTab(ActiveTabIndex + 1);
                     }
 
-                    tabFloatingDragDropWindow.Start(tabItem, TabReferenceSize.Width);
+                    tabFloatingDragDropWindow.Start(tabItem, _tabMaxWidth);
 
                     TabDragBegin?.Invoke(this, new EventArgs());
 
