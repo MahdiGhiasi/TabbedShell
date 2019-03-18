@@ -36,6 +36,7 @@ namespace TabbedShell.ContextMenus
 
         Storyboard menuOpenStoryboard, menuCloseStoryboard;
         private Window ownerWindow;
+        private Point windowPosition;
 
         public ContextMenu()
         {
@@ -46,6 +47,8 @@ namespace TabbedShell.ContextMenus
 
             menuOpenStoryboard = (FindResource("MenuOpenStoryboard") as Storyboard);
             menuCloseStoryboard = (FindResource("MenuCloseStoryboard") as Storyboard);
+
+            windowPosition = CursorHelper.GetCursorPosition();
         }
 
         private void ContextMenu_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -110,10 +113,8 @@ namespace TabbedShell.ContextMenus
 
         private void SetWindowPosition()
         {
-            var point = CursorHelper.GetCursorPosition();
-
-            this.Left = point.X - this.Width / 2;
-            this.Top = point.Y;
+            this.Left = windowPosition.X - this.Width / 2;
+            this.Top = windowPosition.Y;
         }
     }
 }

@@ -17,26 +17,23 @@ namespace TabbedShell.ContextMenus
         {
             get
             {
-                if (threeDotContextMenu == null)
+                threeDotContextMenu = new ContextMenu();
+                threeDotContextMenu.Items.Add(new ContextMenuItem
                 {
-                    threeDotContextMenu = new ContextMenu();
-                    threeDotContextMenu.Items.Add(new ContextMenuItem
+                    Text = "New Window",
+                    Action = (ownerWindow) =>
                     {
-                        Text = "New Window",
-                        Action = (ownerWindow) =>
-                        {
-                            (new MainWindow()).Show();
-                        }
-                    });
-                    threeDotContextMenu.Items.Add(new ContextMenuItem
+                        (new MainWindow()).Show();
+                    }
+                });
+                threeDotContextMenu.Items.Add(new ContextMenuItem
+                {
+                    Text = "Settings",
+                    Action = (ownerWindow) =>
                     {
-                        Text = "Settings",
-                        Action = (ownerWindow) =>
-                        {
-                            SettingsWindow.ShowSettingsWindow(new Point(ownerWindow.Left + ownerWindow.Width / 2, ownerWindow.Top + ownerWindow.Height / 2));
-                        }
-                    });
-                }
+                        SettingsWindow.ShowSettingsWindow(new Point(ownerWindow.Left + ownerWindow.Width / 2, ownerWindow.Top + ownerWindow.Height / 2));
+                    }
+                });
 
                 return threeDotContextMenu;
             }
@@ -46,38 +43,35 @@ namespace TabbedShell.ContextMenus
         {
             get
             {
-                if (newTabContextMenu == null)
+                newTabContextMenu = new ContextMenu
                 {
-                    newTabContextMenu = new ContextMenu
-                    {
-                        Width = 200,
-                    };
+                    Width = 200,
+                };
 
-                    newTabContextMenu.Items.Add(new ContextMenuItem
+                newTabContextMenu.Items.Add(new ContextMenuItem
+                {
+                    Text = "Command Prompt",
+                    Action = (ownerWindow) =>
                     {
-                        Text = "Command Prompt",
-                        Action = (ownerWindow) =>
-                        {
-                            (ownerWindow as MainWindow).StartProcess("cmd.exe");
-                        }
-                    });
-                    newTabContextMenu.Items.Add(new ContextMenuItem
+                        (ownerWindow as MainWindow).StartProcess("cmd.exe");
+                    }
+                });
+                newTabContextMenu.Items.Add(new ContextMenuItem
+                {
+                    Text = "Windows PowerShell",
+                    Action = (ownerWindow) =>
                     {
-                        Text = "Windows PowerShell",
-                        Action = (ownerWindow) =>
-                        {
-                            (ownerWindow as MainWindow).StartProcess("powershell.exe");
-                        }
-                    });
-                    newTabContextMenu.Items.Add(new ContextMenuItem
+                        (ownerWindow as MainWindow).StartProcess("powershell.exe");
+                    }
+                });
+                newTabContextMenu.Items.Add(new ContextMenuItem
+                {
+                    Text = "Windows Subsystem for Linux",
+                    Action = (ownerWindow) =>
                     {
-                        Text = "Windows Subsystem for Linux",
-                        Action = (ownerWindow) =>
-                        {
-                            (ownerWindow as MainWindow).StartProcess("bash.exe");
-                        }
-                    });
-                }
+                        (ownerWindow as MainWindow).StartProcess("bash.exe");
+                    }
+                });
 
                 return newTabContextMenu;
             }
@@ -92,15 +86,6 @@ namespace TabbedShell.ContextMenus
 
                 return c1 || c2;
             }
-        }
-
-        internal static void Close()
-        {
-            threeDotContextMenu?.Close();
-            newTabContextMenu?.Close();
-
-            threeDotContextMenu = null;
-            newTabContextMenu = null;
         }
     }
 }
