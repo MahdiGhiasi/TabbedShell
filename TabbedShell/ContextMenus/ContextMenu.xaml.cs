@@ -34,11 +34,22 @@ namespace TabbedShell.ContextMenus
             }
         }
 
+        public event EventHandler MenuClosing;
+
+        private readonly TimeSpan subMenuOpenMouseOverDelay = TimeSpan.FromSeconds(0.3);
+
         Storyboard menuOpenStoryboard, menuCloseStoryboard;
         private Window ownerWindow;
-        private Point windowPosition;
+        private Func<object> invokeObjectCreator;
+        private Point windowTopCenterPosition;
+        private bool hasChildMenuOpen = false;
 
         public ContextMenu()
+            : this(CursorHelper.GetCursorPosition())
+        {
+        }
+
+        public ContextMenu(Point position)
         {
             InitializeComponent();
 
@@ -48,7 +59,7 @@ namespace TabbedShell.ContextMenus
             menuOpenStoryboard = (FindResource("MenuOpenStoryboard") as Storyboard);
             menuCloseStoryboard = (FindResource("MenuCloseStoryboard") as Storyboard);
 
-            windowPosition = CursorHelper.GetCursorPosition();
+            windowTopCenterPosition = position;
         }
 
         private void ContextMenu_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -62,13 +73,20 @@ namespace TabbedShell.ContextMenus
             MainGrid.Height = this.Height - 2;
         }
 
-        private async void Window_Deactivated(object sender, EventArgs e)
+        private void Window_Deactivated(object sender, EventArgs e)
         {
+            if (!hasChildMenuOpen)
+                CloseContextMenu();
+        }
+
+        private async void CloseContextMenu()
+        {
+            MenuClosing?.Invoke(this, new EventArgs());
             HideContextMenuAnimation();
             await Task.Delay(150);
             Left = 100000;
             await Task.Delay(50);
-            this.Hide();
+            this.Close();
         }
 
         private void HideContextMenuAnimation()
@@ -84,9 +102,10 @@ namespace TabbedShell.ContextMenus
             SetWindowPosition();
         }
 
-        public async void ShowContextMenu(Window ownerWindow)
+        public async void ShowContextMenu(Window ownerWindow, Func<object> invokeObjectCreator)
         {
             this.ownerWindow = ownerWindow;
+            this.invokeObjectCreator = invokeObjectCreator;
 
             this.Opacity = 0;
             this.Show();
@@ -107,14 +126,61 @@ namespace TabbedShell.ContextMenus
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = (sender as Control).Tag as ContextMenuItem;
-            item.Action?.Invoke(ownerWindow);
+            if ((sender as Control).Tag is ContextMenuClickableItem)
+            {
+                var item = (sender as Control).Tag as ContextMenuClickableItem;
+                item?.Action?.Invoke(invokeObjectCreator());
+            }
+            else if ((sender as Control).Tag is ContextMenuExpandableItem)
+            {
+                var item = sender as Control;
+
+                OpenChildMenu(sender as Control);
+            }
+        }
+
+        private void OpenChildMenu(Control menuItem)
+        {
+            var contextMenuItem = menuItem.Tag as ContextMenuExpandableItem;
+
+            var childMenu = new ContextMenu(new Point(windowTopCenterPosition.X + this.Width / 2 + contextMenuItem.ChildMenuWidth / 2,
+                windowTopCenterPosition.Y + menuItem.TransformToAncestor(this).Transform(new Point(0, 0)).Y))
+            {
+                Width = contextMenuItem.ChildMenuWidth,
+            };
+            foreach (var item in contextMenuItem.Items)
+                childMenu.Items.Add(item);
+
+            childMenu.MenuClosing += (s, e) =>
+            {
+                hasChildMenuOpen = false;
+                if (!this.IsMouseOver)
+                {
+                    CloseContextMenu();
+                }
+            };
+
+            hasChildMenuOpen = true;
+            childMenu.ShowContextMenu(ownerWindow, invokeObjectCreator);
+
+            // TODO: Don't hide and reshow if user clicks on the item that is already expanded.
+        }
+
+        private async void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if ((sender as Control).Tag is ContextMenuExpandableItem)
+            {
+                await Task.Delay(subMenuOpenMouseOverDelay);
+
+                if ((sender as Control).IsMouseOver)
+                    OpenChildMenu(sender as Control);
+            }
         }
 
         private void SetWindowPosition()
         {
-            this.Left = windowPosition.X - this.Width / 2;
-            this.Top = windowPosition.Y;
+            this.Left = windowTopCenterPosition.X - this.Width / 2;
+            this.Top = windowTopCenterPosition.Y;
         }
     }
 }

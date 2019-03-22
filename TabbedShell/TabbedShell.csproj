@@ -105,6 +105,7 @@
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AcrylicBlurHelper.cs" />
+    <Compile Include="Helpers\ConsoleFunctions.cs" />
     <Compile Include="Helpers\CursorHelper.cs" />
     <Compile Include="Helpers\DefaultWindowNames.cs" />
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />

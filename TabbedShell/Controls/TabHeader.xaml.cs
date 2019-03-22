@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using TabbedShell.ContextMenus;
 using TabbedShell.Model;
+using TabbedShell.Model.ContextMenu;
 using TabbedShell.Model.UI;
 
 namespace TabbedShell.Controls
@@ -157,9 +158,9 @@ namespace TabbedShell.Controls
         private void NewTab_Click(object sender, RoutedEventArgs e)
         {
             if (Properties.Settings.Default.NewTabDefaultIndex == 0)
-                AppContextMenus.NewTabContextMenu.ShowContextMenu(FindMyWindow());
+                AppContextMenus.NewTabContextMenu.ShowContextMenu(FindMyWindow(), FindMyWindow);
             else
-                AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1].Action?.Invoke(FindMyWindow());
+                (AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1] as ContextMenuClickableItem)?.Action?.Invoke(FindMyWindow());
         }
 
         private void Tab_Click(object sender, RoutedEventArgs e)
@@ -176,6 +177,18 @@ namespace TabbedShell.Controls
             {
                 var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
                 CloseTab(hostedWindowItem);
+            }
+            else if (e.ChangedButton == MouseButton.Right && e.RightButton == MouseButtonState.Released)
+            {
+                var hostedWindowItem = (sender as Control).Tag as HostedWindowItem;
+                AppContextMenus.TabContextMenu.ShowContextMenu(FindMyWindow(), () =>
+                {
+                    return new WindowContextMenuInfo
+                    {
+                        ContainerWindow = FindMyWindow() as MainWindow,
+                        HostedWindow = hostedWindowItem,
+                    };
+                });
             }
         }
 

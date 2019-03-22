@@ -50,7 +50,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
                         <Border Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -99,5 +99,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Application.Resources>
 </Application>

@@ -43,18 +43,30 @@
         <Grid x:Name="MainGrid" VerticalAlignment="Bottom">
             <Grid Margin="0,8,0,8">
                 <Grid x:Name="ItemSizeReference" Height="30" />
-                <ItemsControl x:Name="ItemsList" BorderThickness="0" Background="Transparent">
+                <ItemsControl x:Name="ItemsList" 
+                              HorizontalContentAlignment="Stretch"
+                              BorderThickness="0" 
+                              Background="Transparent">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0,0,0,0">
+                            <Grid Margin="0,0,0,0">
                                 <Button Style="{StaticResource ContextMenuButton}"
                                         Tag="{Binding}"
                                         Click="MenuItem_Click"
+                                        MouseEnter="MenuItem_MouseEnter"
+                                        HorizontalContentAlignment="Stretch"
                                         Height="{Binding ActualHeight, ElementName=ItemSizeReference, Mode=OneWay}">
-                                    <TextBlock Text="{Binding Text}"
-                                               Margin="12,0,8,0" />
+                                    <Grid>
+                                        <TextBlock Text="{Binding Text}"
+                                                   Margin="12,0,8,0" />
+                                        <TextBlock Text="&#xE00F;"
+                                                   Visibility="{Binding IsExpandable, Converter={StaticResource BoolToVis}}"
+                                                   Margin="0,1,8,0"
+                                                   HorizontalAlignment="Right"
+                                                   FontFamily="Segoe MDL2 Assets" />
+                                    </Grid>
                                 </Button>
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

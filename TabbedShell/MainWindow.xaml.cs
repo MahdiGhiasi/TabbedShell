@@ -24,6 +24,7 @@ using TabbedShell.ContextMenus;
 using TabbedShell.Controls;
 using TabbedShell.Helpers;
 using TabbedShell.Model;
+using TabbedShell.Model.ContextMenu;
 using TabbedShell.Win32.Interop;
 using TabbedShell.Win32.Structs;
 
@@ -49,7 +50,7 @@ namespace TabbedShell
                 if (Properties.Settings.Default.NewTabDefaultIndex == 0)
                     StartProcess("cmd.exe");
                 else
-                    AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1].Action?.Invoke(this);
+                    (AppContextMenus.NewTabContextMenu.Items[Properties.Settings.Default.NewTabDefaultIndex - 1] as ContextMenuClickableItem)?.Action?.Invoke(this);
             }));
         }
 
@@ -312,7 +313,7 @@ namespace TabbedShell
 
         private void ThreeDotsMenu_Click(object sender, RoutedEventArgs e)
         {
-            AppContextMenus.ThreeDotContextMenu.ShowContextMenu(this);
+            AppContextMenus.ThreeDotContextMenu.ShowContextMenu(this, () => this);
         }
 
         private void Window_Closed(object sender, EventArgs e)
