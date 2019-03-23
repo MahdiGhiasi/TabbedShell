@@ -15,6 +15,11 @@ using TabbedShell.Win32.Interop;
 
 namespace TabbedShell.Classes.DragAndDrop
 {
+
+    /// <summary>
+    /// WPF's own DragDrop handling mechanism was sometimes causing serious problems (FatalExecutionEngineError, which
+    /// is not recoverable), so I created a custom Drag and Drop handling mechanism instead.
+    /// </summary>
     public class DragDropHandler
     {
         public IDragDropVisualProvider VisualProvider { get; }
