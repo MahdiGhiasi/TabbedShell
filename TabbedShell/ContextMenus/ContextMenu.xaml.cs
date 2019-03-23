@@ -39,6 +39,7 @@ namespace TabbedShell.ContextMenus
         public event EventHandler MenuClosing;
 
         private readonly TimeSpan subMenuOpenMouseOverDelay = TimeSpan.FromSeconds(0.3);
+        private readonly TimeSpan subMenuCloseMouseOverDelay = TimeSpan.FromSeconds(0.3);
 
         Storyboard menuOpenStoryboard, menuCloseStoryboard;
         private Window ownerWindow;
@@ -182,6 +183,13 @@ namespace TabbedShell.ContextMenus
 
                 if ((sender as Control).IsMouseOver)
                     OpenChildMenu(sender as Control);
+            }
+            else if ((sender as Control).Tag is ContextMenuClickableItem)
+            {
+                await Task.Delay(subMenuCloseMouseOverDelay);
+
+                if ((sender as Control).IsMouseOver)
+                    this.Activate(); // Close any child menus that are open
             }
         }
 
