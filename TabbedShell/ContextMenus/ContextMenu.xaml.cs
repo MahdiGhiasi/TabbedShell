@@ -144,9 +144,10 @@ namespace TabbedShell.ContextMenus
         private void OpenChildMenu(Control menuItem)
         {
             var contextMenuItem = menuItem.Tag as ContextMenuExpandableItem;
+            var dpi = VisualTreeHelper.GetDpi(this);
 
-            var childMenu = new ContextMenu(new Point(windowTopCenterPosition.X + this.Width / 2 + contextMenuItem.ChildMenuWidth / 2,
-                windowTopCenterPosition.Y + menuItem.TransformToAncestor(this).Transform(new Point(0, 0)).Y))
+            var childMenu = new ContextMenu(new Point(windowTopCenterPosition.X + dpi.DpiScaleX * this.Width / 2 + dpi.DpiScaleX * contextMenuItem.ChildMenuWidth / 2,
+                windowTopCenterPosition.Y + dpi.DpiScaleX * menuItem.TransformToAncestor(this).Transform(new Point(0, 0)).Y))
             {
                 Width = contextMenuItem.ChildMenuWidth,
             };
