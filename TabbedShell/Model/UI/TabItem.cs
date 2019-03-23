@@ -90,6 +90,5 @@ namespace TabbedShell.Model.UI
         }
 
         public TabHeader ContainingTabHeader { get; set; }
-        public bool DragAndDropping { get; set; }
     }
 }

@@ -125,9 +125,22 @@ namespace TabbedShell.Win32.Interop
         [DllImport("User32.dll")]
         public static extern Int64 SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("User32.dll")]
+        public static extern Int64 SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, RECT lParam);
+
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
 
         public const int WmPaint = 0x000F;
 
@@ -146,5 +159,10 @@ namespace TabbedShell.Win32.Interop
         public const int LWA_COLORKEY = 0x1;
 
         public const int WM_SYSCOMMAND = 0x0112;
+        public const int WM_DPICHANGED = 0x02E0;
+
+        public const int SWP_NOZORDER = 0x0004;
+        public const int SWP_NOSIZE = 0x0001;
+        public const int SWP_SHOWWINDOW = 0x0040;
     }
 }

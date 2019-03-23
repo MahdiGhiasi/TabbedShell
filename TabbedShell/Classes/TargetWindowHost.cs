@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using TabbedShell.Win32.Interop;
 
 namespace TabbedShell.Classes
@@ -37,6 +40,21 @@ namespace TabbedShell.Classes
 
         protected override void DestroyWindowCore(HandleRef hwnd)
         {
+        }
+
+        public void SetWindowPosition(Window window)
+        {
+            var position = this.TranslatePoint(new Point(0, 0), window);
+
+            var dpi = VisualTreeHelper.GetDpi(window);
+
+            var winLeft = position.X * dpi.DpiScaleX;
+            var winTop = position.Y * dpi.DpiScaleY;
+            var winWidth = this.ActualWidth * dpi.DpiScaleX;
+            var winHeight = this.ActualHeight * dpi.DpiScaleY;
+
+            var result = Win32Functions.SetWindowPos(childRef, IntPtr.Zero, (int)winLeft, (int)winTop,
+                (int)winWidth, (int)winHeight, Win32.Enums.SetWindowPosFlags.IgnoreZOrder | Win32.Enums.SetWindowPosFlags.IgnoreResize | Win32.Enums.SetWindowPosFlags.ShowWindow);
         }
     }
 }

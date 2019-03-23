@@ -17,7 +17,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using TabbedShell.Classes.DragAndDrop;
 using TabbedShell.ContextMenus;
+using TabbedShell.Helpers;
 using TabbedShell.Model;
 using TabbedShell.Model.ContextMenu;
 using TabbedShell.Model.UI;
@@ -43,7 +45,6 @@ namespace TabbedShell.Controls
         SemaphoreSlim tabCloseSemaphore = new SemaphoreSlim(1, 1);
         Point? tabMouseDownPosition = null;
 
-        static TabFloatingDragDropWindow tabFloatingDragDropWindow = null; 
         static Thread tabFloatingDragDropThread = null;
 
         private readonly double _minLengthForDrag = 10;
@@ -55,37 +56,6 @@ namespace TabbedShell.Controls
 
             TabsList.ItemsSource = tabs;
             tabs.CollectionChanged += Tabs_CollectionChanged;
-
-            // Create tabFloatingDragDropWindow in new thread to avoid drag and drop blocking issue
-            Task.Run(() =>
-            {
-                if (tabFloatingDragDropThread == null)
-                {
-                    tabFloatingDragDropThread = new Thread(new ThreadStart(TabFloatingDragDropThreadStartingPoint));
-                    tabFloatingDragDropThread.SetApartmentState(ApartmentState.STA);
-                    tabFloatingDragDropThread.IsBackground = true;
-                    tabFloatingDragDropThread.Start();
-                }
-            });
-        }
-
-        private void TabFloatingDragDropThreadStartingPoint()
-        {
-            try
-            {
-                tabFloatingDragDropWindow = new TabFloatingDragDropWindow
-                {
-                    Opacity = 0,
-                };
-
-                tabFloatingDragDropWindow.Show();
-                tabFloatingDragDropWindow.Hide();
-                System.Windows.Threading.Dispatcher.Run();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("TabFloatingDragDropThread:" + ex.ToString());
-            }
         }
 
         public void ActivateTab(Model.UI.TabItem tabItem)
@@ -103,7 +73,7 @@ namespace TabbedShell.Controls
 
             TabActivated?.Invoke(this, new TabActivatedEventArgs
             {
-                WindowHandle = tabs[index].HostedWindowItem.WindowHandle,
+                Tab = tabs[index],
             });
         }
 
@@ -256,7 +226,7 @@ namespace TabbedShell.Controls
 
         private async void TabsList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed)
+            if (sender is ListBoxItem && e.LeftButton == MouseButtonState.Pressed && (App.Current as App).TabsDragDropHandler.IsDragging == false)
             {
                 if (tabMouseDownPosition.HasValue && Point.Subtract(e.GetPosition(FindMyWindow()), tabMouseDownPosition.Value).Length > _minLengthForDrag)
                 {
@@ -267,7 +237,6 @@ namespace TabbedShell.Controls
                         return;
 
                     tabItem.Exiting = true;
-                    tabItem.DragAndDropping = true;
 
                     if (tabs.IndexOf(tabItem) == ActiveTabIndex)
                     {
@@ -277,67 +246,70 @@ namespace TabbedShell.Controls
                             ActivateTab(ActiveTabIndex + 1);
                     }
 
-                    tabFloatingDragDropWindow.Start(tabItem, _tabMaxWidth);
-
                     TabDragBegin?.Invoke(this, new EventArgs());
 
-                    // Make sure UI updates with new tab activations, before being blocked by DoDragDrop
-                    await Task.Delay(10);
+                    var result = await (App.Current as App).TabsDragDropHandler.DoDragDrop(tabItem);
 
-                    try
-                    {
-                        // This function is blocking. The rest of the code run after drop event
-                        DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("DoDragDrop failed: " + ex.ToString());
-                    }
-
-                    await Task.Delay(100);
-                    if (tabItem.Exiting && tabItem.DragAndDropping)
-                    {
-                        // Dropped outside
-                        tabFloatingDragDropWindow.SetBackgroundColor();
-                        tabItem.DragAndDropping = false;
+                    if (result.DropSurface != this)
                         tabs.Remove(tabItem);
-                        var position = await tabFloatingDragDropWindow.StopMovement();
+
+                    if (result.Result == DragDropResult.NewWindowRequested)
+                    {
                         TabNewWindowRequested?.Invoke(this, new TabNewWindowRequestEventArgs
                         {
                             Tab = tabItem,
-                            Position = position,
+                            Position = result.RelativeMousePosition,
                         });
-
-                        // Floating tab should stay there a bit more, so the window have time to initialize.
-                        await Task.Delay(500);
-                        tabFloatingDragDropWindow.Stop(fadeOut: true);
-                    }
-                    else
-                    {
-                        tabFloatingDragDropWindow.Stop();
                     }
 
-                    
                     TabDragEnd?.Invoke(this, new EventArgs());
                 }
             }
         }
 
-        private void TabsList_Drop(object sender, DragEventArgs e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
+            (App.Current as App).TabsDragDropHandler.Initialize();
+            (App.Current as App).TabsDragDropHandler.AddDropSurface(this, TabDrop);
+        }
 
-            Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
-            Model.UI.TabItem target = ((ListBoxItem)(sender)).DataContext as Model.UI.TabItem;
+        private void TabDrop(DropEventArgs e)
+        {
+            foreach (var item in tabs)
+            {
+                ListBoxItem myListBoxItem = (ListBoxItem)(TabsList.ItemContainerGenerator.ContainerFromItem(item));
+                ContentPresenter myContentPresenter = VisualHelper.FindVisualChild<ContentPresenter>(myListBoxItem);
 
-            var addNext = (e.GetPosition((ListBoxItem)sender).X > ((ListBoxItem)sender).ActualWidth / 2);
+                if (myContentPresenter.IsMouseOver)
+                {
+                    var tabPosition = myContentPresenter.TransformToAncestor(FindMyWindow())
+                        .Transform(new Point(0, 0));
 
-            tabFloatingDragDropWindow.Stop();
+                    var position = new Point(e.RelativeMousePosition.X - tabPosition.X, e.RelativeMousePosition.Y - tabPosition.Y);
 
-            if (!droppedData.DragAndDropping)
-                return;
+                    TabDropOnElement(item, position, e.Data as Model.UI.TabItem);
+                    return;
+                }
+            }
 
-            droppedData.DragAndDropping = false;
+            TabDropOnEmptyArea(e.Data as Model.UI.TabItem);
+        }
+
+        private void TabDropOnEmptyArea(Model.UI.TabItem droppedData)
+        {
+            droppedData.Exiting = false;
+
+            droppedData.ContainingTabHeader.tabs.Remove(droppedData);
+            tabs.Add(droppedData);
+
+            droppedData.ContainingTabHeader = this;
+            ActivateTab(droppedData);
+        }
+
+        private void TabDropOnElement(Model.UI.TabItem target, Point position, Model.UI.TabItem droppedData)
+        {
+            var addNext = (position.X > (TabReferenceSize.ActualWidth / 2));
+
             droppedData.Exiting = false;
 
             if (addNext)
@@ -353,57 +325,6 @@ namespace TabbedShell.Controls
 
             droppedData.ContainingTabHeader = this;
             ActivateTab(droppedData);
-
-        }
-
-        private void UserControl_Drop(object sender, DragEventArgs e)
-        {
-            Model.UI.TabItem droppedData = e.Data.GetData(typeof(Model.UI.TabItem)) as Model.UI.TabItem;
-
-            tabFloatingDragDropWindow.Stop();
-
-            if (droppedData == null)
-                return;
-
-            if (!droppedData.DragAndDropping)
-                return;
-
-            droppedData.DragAndDropping = false;
-            droppedData.Exiting = false;
-
-            droppedData.ContainingTabHeader.tabs.Remove(droppedData);
-            tabs.Add(droppedData);
-
-            droppedData.ContainingTabHeader = this;
-            ActivateTab(droppedData);
-        }
-
-        private void TabsList_GiveFeedback(object sender, GiveFeedbackEventArgs e)
-        {
-            Mouse.SetCursor(Cursors.Arrow);
-
-            e.UseDefaultCursors = false;
-            e.Handled = true;
-        }
-
-        private void TabsList_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
-        {
-            SetTabFloatingDragDropWindowPosition();
-        }
-
-        private void SetTabFloatingDragDropWindowPosition()
-        {
-            if (tabFloatingDragDropWindow == null)
-                return;
-            if (tabFloatingDragDropWindow.Visibility != Visibility.Visible)
-                return;
-
-            tabFloatingDragDropWindow.FollowMouse();
-        }
-
-        public static void DisposeFloatingDragDropThread()
-        {
-            tabFloatingDragDropThread.Abort();
         }
     }
 
@@ -421,6 +342,6 @@ namespace TabbedShell.Controls
 
     public class TabActivatedEventArgs : EventArgs
     {
-        public IntPtr WindowHandle { get; set; }
+        public Model.UI.TabItem Tab { get; set; }
     }
 }

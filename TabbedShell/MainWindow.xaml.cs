@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -35,9 +36,12 @@ namespace TabbedShell
     /// </summary>
     public partial class MainWindow : Window
     {
-        public IntPtr CurrentContainedWindowHandle => TabsContainer.ActiveTabIndex == -1 ? IntPtr.Zero : TabsContainer.Tabs[TabsContainer.ActiveTabIndex].HostedWindowItem.WindowHandle;
+        public HostedWindowItem CurrentContainedWindow => TabsContainer.ActiveTabIndex == -1 ? null : TabsContainer.Tabs[TabsContainer.ActiveTabIndex].HostedWindowItem;
+        public IntPtr CurrentContainedWindowHandle => CurrentContainedWindow?.WindowHandle ?? IntPtr.Zero;
 
         bool switchToContentEnabled = true;
+
+        private Point? initialAbsolutePosition = null;
 
         public MainWindow()
         {
@@ -63,9 +67,54 @@ namespace TabbedShell
             CreateTabForWindow(windowHandle, title);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        /// <param name="position">In absolute pixels</param>
+        /// <param name="size">In logical pixels</param>
+        public MainWindow(Point position, Size size)
+            : this()
+        {
+            initialAbsolutePosition = position;
+            this.Width = size.Width;
+            this.Height = size.Height;
+        }
+
+        /// <param name="position">In absolute pixels</param>
+        /// <param name="size">In logical pixels</param>
+        public MainWindow(IntPtr windowHandle, string title, Point position, Size size) 
+            : this(windowHandle, title)
+        {
+            initialAbsolutePosition = position;
+            this.Width = size.Width;
+            this.Height = size.Height;
+        }
+
+        /// <param name="position">In absolute pixels</param>
+        public MainWindow(Point position)
+            : this()
+        {
+            initialAbsolutePosition = position;
+        }
+
+        /// <param name="position">In absolute pixels</param>
+        public MainWindow(IntPtr windowHandle, string title, Point position)
+            : this(windowHandle, title)
+        {
+            initialAbsolutePosition = position;
+        }
+
+        private void Window_SourceInitialized(object sender, EventArgs e)
         {
             this.EnableAcrylicBlur();
+            if (initialAbsolutePosition.HasValue)
+            {
+                var interop = new WindowInteropHelper(this);
+                Win32Functions.SetWindowPos(interop.Handle, IntPtr.Zero, (int)initialAbsolutePosition.Value.X, (int)initialAbsolutePosition.Value.Y,
+                    0, 0, Win32.Enums.SetWindowPosFlags.IgnoreZOrder | Win32.Enums.SetWindowPosFlags.IgnoreResize | Win32.Enums.SetWindowPosFlags.ShowWindow);   
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            OnResize();
         }
 
         public async void StartProcess(string procName)
@@ -117,13 +166,26 @@ namespace TabbedShell
             }));
         }
 
-        private void AttachToWindow(IntPtr handle)
+        private async void AttachToWindow(HostedWindowItem item)
         {
-            ContainTargetWindow(handle);
-            if (Properties.Settings.Default.TransparentTerminalEnabled)
+            try
             {
-                SetWindowOpacity(CurrentContainedWindowHandle, Properties.Settings.Default.TerminalTransparencyAmount);
+                await ContainTargetWindow(item);
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                TabsContainer.CloseTab(item);
+            }
+
+            try
+            {
+                if (Properties.Settings.Default.TransparentTerminalEnabled)
+                {
+                    SetWindowOpacity(item.WindowHandle, Properties.Settings.Default.TerminalTransparencyAmount);
+                }
+            }
+            catch { }
         }
 
         private void SetWindowOpacity(IntPtr containedWindowHandle, double opacity)
@@ -159,8 +221,10 @@ namespace TabbedShell
             Win32Functions.SetForegroundWindow(CurrentContainedWindowHandle);
         }
 
-        private async void ContainTargetWindow(IntPtr target)
+        private async Task ContainTargetWindow(HostedWindowItem item)
         {
+            var target = item.WindowHandle;
+
             MyHost host;
             if ((App.Current as App).TargetWindowHosts.ContainsKey(target))
             {
@@ -182,7 +246,13 @@ namespace TabbedShell
                 return;
             }
 
-            
+            // TODO: Try to make it faster on console launch. But how?
+            var dpi = VisualTreeHelper.GetDpi(this);
+            if (item.Dpi != dpi.PixelsPerInchX)
+            {
+                ConsoleFunctions.SendDpiChangedMessage(target, (int)dpi.PixelsPerInchX);
+                item.Dpi = dpi.PixelsPerInchX;
+            }
 
             await Task.Delay(10);
 
@@ -273,7 +343,16 @@ namespace TabbedShell
 
         private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
         {
-            this.WindowState = WindowState.Maximized;
+            if (this.WindowState == WindowState.Maximized)
+            {
+                this.WindowState = WindowState.Normal;
+            }
+            else
+            {
+                this.WindowStyle = WindowStyle.SingleBorderWindow;
+                this.WindowState = WindowState.Maximized;
+                this.WindowStyle = WindowStyle.None;
+            }
         }
 
         private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
@@ -323,14 +402,13 @@ namespace TabbedShell
             if ((App.Current as App).MainWindows.Count == 0
                 && !Properties.Settings.Default.AttachToAllTerminalsEnabled)
             {
-                TabHeader.DisposeFloatingDragDropThread();
                 Application.Current.Shutdown();
             }
         }
 
         private void TabsContainer_TabActivated(object sender, Controls.TabActivatedEventArgs e)
         {
-            AttachToWindow(e.WindowHandle);
+            AttachToWindow(e.Tab.HostedWindowItem);
         }
 
         private void TabsContainer_TabClosing(object sender, Controls.TabCloseEventArgs e)
@@ -344,12 +422,8 @@ namespace TabbedShell
 
         private void TabsContainer_TabNewWindowRequested(object sender, Controls.TabNewWindowRequestEventArgs e)
         {
-            var newWindow = new MainWindow(e.Tab.HostedWindowItem.WindowHandle, e.Tab.Title)
-            {
-                Left = e.Position.X,
-                Top = e.Position.Y,
-            };
-
+            var newWindow = new MainWindow(e.Tab.HostedWindowItem.WindowHandle, e.Tab.Title,
+                new Point(e.Position.X, e.Position.Y));
             newWindow.Show();
         }
 
@@ -371,6 +445,45 @@ namespace TabbedShell
                 Debug.WriteLine("goodbye :(");
                 this.Close();
             }
+        }
+
+        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+        {
+            if (CurrentContainedWindow != null)
+            {
+                ConsoleFunctions.SendDpiChangedMessage(CurrentContainedWindowHandle, (int)newDpi.PixelsPerInchX);
+                CurrentContainedWindow.Dpi = (int)newDpi.PixelsPerInchX;
+            }
+            base.OnDpiChanged(oldDpi, newDpi);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            OnResize();
+        }
+
+        private void OnResize()
+        {
+            if (this.WindowState == WindowState.Maximized)
+            {
+                this.BorderThickness = new Thickness(5);
+
+                var target = CurrentContainedWindowHandle;
+                (App.Current as App).TargetWindowHosts[target].SetWindowPosition(this);
+
+                MaximizeRestoreButtonText.Visibility = Visibility.Visible;
+                MaximizeButtonText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.BorderThickness = new Thickness(0);
+
+                MaximizeRestoreButtonText.Visibility = Visibility.Collapsed;
+                MaximizeButtonText.Visibility = Visibility.Visible;
+            }
+
+            if ((App.Current as App).TargetWindowHosts.ContainsKey(CurrentContainedWindowHandle))
+                (App.Current as App).TargetWindowHosts[CurrentContainedWindowHandle].SetWindowPosition(this);
         }
     }
 }

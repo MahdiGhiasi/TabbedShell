@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using TabbedShell.Classes;
+using TabbedShell.Classes.DragAndDrop;
 using TabbedShell.Helpers;
 using TabbedShell.Win32.Enums;
 using TabbedShell.Win32.Interop;
@@ -25,6 +26,8 @@ namespace TabbedShell
     {
         public List<MainWindow> MainWindows { get; } = new List<MainWindow>();
         public Dictionary<IntPtr, MyHost> TargetWindowHosts { get; } = new Dictionary<IntPtr, MyHost>();
+
+        public DragDropHandler TabsDragDropHandler { get; } = new DragDropHandler(new TabItemDragDropVisualProvider());
 
         public SemaphoreSlim WindowContainSemaphore { get; } = new SemaphoreSlim(1, 1);
 
@@ -172,13 +175,9 @@ namespace TabbedShell
                             return;
 
                         System.Windows.Forms.Screen.PrimaryScreen.GetScaleFactors(out double scaleX, out double scaleY);
-                        var mainWindow = new MainWindow(hwnd, title)
-                        {
-                            Left = placement.NormalPosition.Left / scaleX,
-                            Top = placement.NormalPosition.Top / scaleY,
-                            Width = placement.NormalPosition.Width / scaleX,
-                            Height = placement.NormalPosition.Height / scaleY,
-                        };
+                        var mainWindow = new MainWindow(hwnd, title,
+                            new Point(placement.NormalPosition.Left / scaleX, placement.NormalPosition.Top / scaleY),
+                            new Size(placement.NormalPosition.Width / scaleX, placement.NormalPosition.Height / scaleY));
                         mainWindow.Show();
                     }
                     finally
@@ -206,10 +205,7 @@ namespace TabbedShell
                 foreach (var (window, tab) in allTabs)
                     if (tab.HostedWindowItem.WindowHandle == hwnd)
                     {
-                        // Bring window to front without activating it
-                        // https://stackoverflow.com/a/14211193/942659
-                        Win32Functions.SetWindowPos((new WindowInteropHelper(window)).Handle,
-                            Win32Functions.HWND_TOP, 0, 0, 0, 0, SetWindowPosFlags.IgnoreMove | SetWindowPosFlags.IgnoreResize | SetWindowPosFlags.DoNotActivate);
+                        window.BringToFront();
                     }
             }
             catch (Exception ex)

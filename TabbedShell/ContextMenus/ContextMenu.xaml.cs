@@ -10,12 +10,14 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TabbedShell.Helpers;
 using TabbedShell.Model.ContextMenu;
+using TabbedShell.Win32.Interop;
 
 namespace TabbedShell.ContextMenus
 {
@@ -45,7 +47,7 @@ namespace TabbedShell.ContextMenus
         private bool hasChildMenuOpen = false;
 
         public ContextMenu()
-            : this(CursorHelper.GetCursorPosition())
+            : this(CursorHelper.GetRawCursorPosition())
         {
         }
 
@@ -179,8 +181,13 @@ namespace TabbedShell.ContextMenus
 
         private void SetWindowPosition()
         {
-            this.Left = windowTopCenterPosition.X - this.Width / 2;
-            this.Top = windowTopCenterPosition.Y;
+            var dpi = VisualTreeHelper.GetDpi(this);
+
+            var left = windowTopCenterPosition.X - dpi.DpiScaleX * this.Width / 2;
+            var top = windowTopCenterPosition.Y;
+
+            this.Left = left / dpi.DpiScaleX;
+            this.Top = top / dpi.DpiScaleY;
         }
     }
 }

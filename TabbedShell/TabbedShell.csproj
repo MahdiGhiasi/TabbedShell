@@ -94,6 +94,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Classes\DragAndDrop\DragDropHandler.cs" />
+    <Compile Include="Classes\DragAndDrop\DragDropResult.cs" />
+    <Compile Include="Classes\DragAndDrop\DropEventArgs.cs" />
+    <Compile Include="Classes\DragAndDrop\DropSurfaceData.cs" />
+    <Compile Include="Classes\DragAndDrop\IDragDropVisualProvider.cs" />
+    <Compile Include="Classes\DragAndDrop\TabItemDragDropVisualProvider.cs" />
+    <Compile Include="Classes\DragAndDrop\Win32.cs" />
     <Compile Include="Classes\ProcessExtensions.cs" />
     <Compile Include="Classes\ScreenExtensions.cs" />
     <Compile Include="Classes\WindowExtensions.cs" />
@@ -108,6 +115,7 @@
     <Compile Include="Helpers\ConsoleFunctions.cs" />
     <Compile Include="Helpers\CursorHelper.cs" />
     <Compile Include="Helpers\DefaultWindowNames.cs" />
+    <Compile Include="Helpers\VisualHelper.cs" />
     <Compile Include="Model\ContextMenu\ContextMenuItem.cs" />
     <Compile Include="Model\HostedWindowItem.cs" />
     <Compile Include="Model\UI\ModelBase.cs" />

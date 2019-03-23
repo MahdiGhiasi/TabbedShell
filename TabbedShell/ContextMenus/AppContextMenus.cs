@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using TabbedShell.Helpers;
 using TabbedShell.Model;
 using TabbedShell.Model.ContextMenu;
@@ -34,7 +35,9 @@ namespace TabbedShell.ContextMenus
                     Action = (e) =>
                     {
                         var ownerWindow = e as MainWindow;
-                        SettingsWindow.ShowSettingsWindow(new Point(ownerWindow.Left + ownerWindow.Width / 2, ownerWindow.Top + ownerWindow.Height / 2));
+                        var dpi = VisualTreeHelper.GetDpi(ownerWindow);
+                        SettingsWindow.ShowSettingsWindow(new Point(dpi.DpiScaleX * (ownerWindow.Left + ownerWindow.Width / 2), 
+                            dpi.DpiScaleY * (ownerWindow.Top + ownerWindow.Height / 2)));
                     }
                 });
 

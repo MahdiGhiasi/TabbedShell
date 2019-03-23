@@ -11,5 +11,6 @@ namespace TabbedShell.Model
     {
         public IntPtr WindowHandle { get; set; }
         public TabItem TabItem { get; set; }
+        public double Dpi { get; set; }
     }
 }

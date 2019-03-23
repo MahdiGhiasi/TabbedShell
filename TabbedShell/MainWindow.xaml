@@ -7,6 +7,7 @@
         xmlns:controls="clr-namespace:TabbedShell.Controls"
         mc:Ignorable="d"
         Activated="Window_Activated"
+        SourceInitialized="Window_SourceInitialized"
         Loaded="Window_Loaded"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseLeftButtonUp="Window_MouseLeftButtonUp"
@@ -14,6 +15,7 @@
         MouseLeave="Window_MouseLeave"
         Closing="Window_Closing"
         Closed="Window_Closed"
+        SizeChanged="Window_SizeChanged"
         Background="#55000000"
         Title="TabbedShell" 
         WindowStyle="None"
@@ -24,7 +26,7 @@
                       ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
 
-    <Border BorderThickness="0.5" BorderBrush="#88444444">
+    <Border x:Name="MainBorder" BorderThickness="0.5" BorderBrush="#88444444">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30" />
@@ -54,10 +56,17 @@
                                    FontFamily="Segoe MDL2 Assets"
                                    TextAlignment="Center" />
                     </Button>
-                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click" IsEnabled="False" Opacity="0.3">
-                        <TextBlock Text="&#xE15B;"
-                                   FontFamily="Segoe MDL2 Assets"
-                                   TextAlignment="Center" />
+                    <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click">
+                        <Grid>
+                            <TextBlock x:Name="MaximizeButtonText"
+                                       Text="&#xE922;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       TextAlignment="Center" />
+                            <TextBlock x:Name="MaximizeRestoreButtonText"
+                                       Text="&#xE923;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       TextAlignment="Center" />
+                        </Grid>
                     </Button>
                     <Button Width="45" Style="{StaticResource WindowCloseButton}" Click="CloseWindow_Click">
                         <TextBlock Text="&#xE947;"

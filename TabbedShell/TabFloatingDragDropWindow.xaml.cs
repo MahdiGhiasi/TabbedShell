@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -15,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using TabbedShell.Helpers;
 using TabbedShell.Model.UI;
+using TabbedShell.Win32.Interop;
 
 namespace TabbedShell
 {
@@ -25,35 +27,27 @@ namespace TabbedShell
     {
         private Model.UI.TabItem tabItem;
 
-        private DispatcherTimer timer;
-
         public TabFloatingDragDropWindow()
         {
             InitializeComponent();
-
-            timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(1),
-            };
-            timer.Tick += Timer_Tick;
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            FollowMouse();
         }
 
         public void FollowMouse()
         {
-            if (!timer.IsEnabled)
-                return;
+            FollowMouse(CursorHelper.GetRawCursorPosition());
+        }
 
+        public void FollowMouse(Point cursorPosition)
+        {
             Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
             {
-                var point = CursorHelper.GetCursorPosition();
+                var dpi = VisualTreeHelper.GetDpi(this);
 
-                this.Left = point.X - 4;
-                this.Top = point.Y - 15;
+                var left = cursorPosition.X - 4 * dpi.DpiScaleX;
+                var top = cursorPosition.Y - 15 * dpi.DpiScaleY;
+
+                this.Left = left / dpi.DpiScaleX;
+                this.Top = top / dpi.DpiScaleY;
             }));
         }
 
@@ -72,7 +66,6 @@ namespace TabbedShell
                     ColoredBorder.BorderThickness = new Thickness(0.5);
                     ColoredBorder.BorderBrush = tabItem.TabActiveBackColor;
 
-                    timer.Start();
                     this.Show();
                 }));
             }
@@ -85,7 +78,6 @@ namespace TabbedShell
             {
                 Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(async () =>
                 {
-                    timer.Stop();
                     if (fadeOut)
                     {
                         var animationDuration = TimeSpan.FromSeconds(0.2);
@@ -116,7 +108,6 @@ namespace TabbedShell
             {
                 Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
                 {
-                    timer.Stop();
                     this.Close();
                 }));
             }
@@ -131,8 +122,8 @@ namespace TabbedShell
 
                 await Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() =>
                 {
-                    timer.Stop();
-                    tcs.TrySetResult(new Point(this.Left, this.Top));
+                    var dpi = VisualTreeHelper.GetDpi(this);
+                    tcs.TrySetResult(new Point(this.Left * dpi.DpiScaleX, this.Top * dpi.DpiScaleY));
                 }));
 
                 return await tcs.Task;

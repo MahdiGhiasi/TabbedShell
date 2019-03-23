@@ -8,7 +8,7 @@
              Background="Transparent"
              SizeChanged="UserControl_SizeChanged"
              AllowDrop="True"
-             Drop="UserControl_Drop"
+             Loaded="UserControl_Loaded"
              d:DesignHeight="30" d:DesignWidth="500">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -37,9 +37,6 @@
                         <EventSetter Event="MouseUp" Handler="TabsList_MouseUp"/>
                         <EventSetter Event="PreviewMouseDown" Handler="TabsList_PreviewMouseDown"/>
                         <EventSetter Event="PreviewMouseMove" Handler="TabsList_PreviewMouseMove"/>
-                        <EventSetter Event="Drop" Handler="TabsList_Drop"/>
-                        <EventSetter Event="GiveFeedback" Handler="TabsList_GiveFeedback"/>
-                        <EventSetter Event="QueryContinueDrag" Handler="TabsList_QueryContinueDrag"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
