@@ -59,10 +59,12 @@
                     <Button Width="45" Style="{StaticResource ThemedButton}" Click="MaximizeWindow_Click">
                         <Grid>
                             <TextBlock x:Name="MaximizeButtonText"
+                                       FontSize="10"
                                        Text="&#xE922;"
                                        FontFamily="Segoe MDL2 Assets"
                                        TextAlignment="Center" />
                             <TextBlock x:Name="MaximizeRestoreButtonText"
+                                       FontSize="10"
                                        Text="&#xE923;"
                                        FontFamily="Segoe MDL2 Assets"
                                        TextAlignment="Center" />
