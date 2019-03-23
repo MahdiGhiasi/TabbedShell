@@ -45,6 +45,7 @@ namespace TabbedShell.ContextMenus
         private Func<object> invokeObjectCreator;
         private Point windowTopCenterPosition;
         private bool hasChildMenuOpen = false;
+        private ContextMenu childMenu;
 
         public ContextMenu()
             : this(CursorHelper.GetRawCursorPosition())
@@ -146,10 +147,14 @@ namespace TabbedShell.ContextMenus
             var contextMenuItem = menuItem.Tag as ContextMenuExpandableItem;
             var dpi = VisualTreeHelper.GetDpi(this);
 
-            var childMenu = new ContextMenu(new Point(windowTopCenterPosition.X + dpi.DpiScaleX * this.Width / 2 + dpi.DpiScaleX * contextMenuItem.ChildMenuWidth / 2,
+            if (hasChildMenuOpen && childMenu != null && childMenu.Tag == contextMenuItem)
+                return;
+
+            childMenu = new ContextMenu(new Point(windowTopCenterPosition.X + dpi.DpiScaleX * this.Width / 2 + dpi.DpiScaleX * contextMenuItem.ChildMenuWidth / 2,
                 windowTopCenterPosition.Y + dpi.DpiScaleX * menuItem.TransformToAncestor(this).Transform(new Point(0, 0)).Y))
             {
                 Width = contextMenuItem.ChildMenuWidth,
+                Tag = contextMenuItem,
             };
             foreach (var item in contextMenuItem.Items)
                 childMenu.Items.Add(item);
