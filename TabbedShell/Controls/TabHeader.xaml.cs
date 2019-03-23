@@ -269,6 +269,9 @@ namespace TabbedShell.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject())) return;
+#endif
             (App.Current as App).TabsDragDropHandler.Initialize();
             (App.Current as App).TabsDragDropHandler.AddDropSurface(this, TabDrop);
         }
