@@ -303,15 +303,6 @@ namespace TabbedShell
         {
             switchToContentEnabled = false;
             Debug.WriteLine("MouseEnter");
-
-            await Task.Delay(100);
-            if (!AppContextMenus.IsAContextMenuOpen && !SettingsWindow.IsOpen)
-            {
-                IntPtr foregroundWindow = Win32Functions.GetForegroundWindow();
-
-                if (foregroundWindow == CurrentContainedWindowHandle)
-                    this.Activate();
-            }
         }
 
         private async void Window_MouseLeave(object sender, MouseEventArgs e)

@@ -28,13 +28,7 @@ namespace TabbedShell.ContextMenus
     {
         public IList<ContextMenuItem> Items { get; private set; } = new ObservableCollection<ContextMenuItem>();
 
-        public bool IsOpened
-        {
-            get
-            {
-                return Visibility == Visibility.Visible;
-            }
-        }
+        public bool IsOpened { get; private set; }
 
         public event EventHandler MenuClosing;
 
@@ -90,6 +84,7 @@ namespace TabbedShell.ContextMenus
             await Task.Delay(150);
             Left = 100000;
             await Task.Delay(50);
+            IsOpened = false;
             this.Close();
         }
 
@@ -110,6 +105,7 @@ namespace TabbedShell.ContextMenus
         {
             this.ownerWindow = ownerWindow;
             this.invokeObjectCreator = invokeObjectCreator;
+            IsOpened = true;
 
             this.Opacity = 0;
             this.Show();
